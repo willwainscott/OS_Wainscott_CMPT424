@@ -190,10 +190,30 @@ var TSOS;
             if (args.length > 0) {
                 var topic = args[0];
                 switch (topic) {
+                    case "ver":
+                        _StdOut.putText("Ver displays the current version of the TSOS.");
+                        break;
                     case "help":
                         _StdOut.putText("Help displays a list of (hopefully) valid commands.");
                         break;
-                    // TODO: Make descriptive MANual page entries for the the rest of the shell commands here.
+                    case "shutdown":
+                        _StdOut.putText("Shutdown turns only the OS off, but leaves the virtual hardware on.");
+                        break;
+                    case "cls":
+                        _StdOut.putText("Clears the screen and resets the cursor position.");
+                        break;
+                    case "man":
+                        _StdOut.putText("Displays the Manual page for a given topic."); // Insert joke about googling Google here
+                        break;
+                    case "trace":
+                        _StdOut.putText("Turns on and off the OS tracing based on input.");
+                        break;
+                    case "rot13":
+                        _StdOut.putText("Does rot13 obfuscation (letter reversal) on a given string.");
+                        break;
+                    case "prompt":
+                        _StdOut.putText("Changes the prompt to a given input.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
