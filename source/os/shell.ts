@@ -16,6 +16,7 @@ module TSOS {
         public commandList = [];
         public curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
         public apologies = "[sorry]";
+        public pillConsumed = false; //Is this the right spot? Should it be in global.ts? Who knows? Not me.
 
         constructor() {
         }
@@ -72,6 +73,25 @@ module TSOS {
                                   "prompt",
                                   "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
+
+            // date
+            sc = new ShellCommand(this.shellDate,
+                                  "date",
+                                  "- Displays the current date and time.");
+            this.commandList[this.commandList.length] = sc;
+
+            //location
+            sc = new ShellCommand(this.shellLocation,
+                                  "loc",
+                                  "- Displays the user's current location.");
+            this.commandList[this.commandList.length] = sc;
+
+            //pill
+            sc = new ShellCommand(this.shellPill,
+                                  "pill",
+                                  "<red | blue> - Take the red or blue pill.");
+            this.commandList[this.commandList.length] = sc;
+
 
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -250,10 +270,19 @@ module TSOS {
                         _StdOut.putText("Turns on and off the OS tracing based on input.");
                         break;
                     case "rot13":
-                        _StdOut.putText("Does rot13 obfuscation (letter reversal) on a given string.");
+                        _StdOut.putText("Does rot13 obfuscation on a given string.");
                         break;
                     case "prompt":
                         _StdOut.putText("Changes the prompt to a given input.");
+                        break;
+                    case "date":
+                        _StdOut.putText("Displays the current date and time. Like clockwork.");
+                        break;
+                    case "loc":
+                        _StdOut.putText("Tells the user where they physically are.");
+                        break;
+                    case "pill":
+                        _StdOut.putText("Take the red or blue pill to decide your fate.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -304,5 +333,51 @@ module TSOS {
             }
         }
 
+        public shellDate(args: string[]) {
+            var currDate = new Date();
+            _StdOut.putText("Current Date and Time: " + (currDate.getMonth() + 1) + "/" + currDate.getDate() + "/" + currDate.getFullYear());
+            _StdOut.putText(" ");
+            // begone military time, you are not allowed here
+
+            // TODO: add a leading 0 for minutes less than 10
+            var hours = currDate.getHours();
+            if (hours < 12) {
+                _StdOut.putText(hours + ":" + currDate.getMinutes() + "AM");
+            } else {
+                _StdOut.putText((hours - 12 ) + ":" + currDate.getMinutes() + "PM");
+            }
+        }
+
+        public shellLocation(args: string[]) {
+            _StdOut.putText("You are in a vat, while your brain \"reads\" a simulated computer screen.");
+        }
+
+        public shellPill(args: string[]) {
+            if (args.length > 0){
+                var pill = args[0];
+                if (!this.pillConsumed) {
+                    switch (pill) {
+                        case "blue":
+                            _StdOut.putText("Hey, blissful ignorance is not that bad, right?");
+                            this.pillConsumed = true;
+                            break;
+                        case "red":
+                            _StdOut.putText("Time to see how deep the rabbit hole goes...");
+                            this.pillConsumed = true;
+                            break;
+                        default:
+                            _StdOut.putText("Sorry fresh out of " + pill + " colored pills.");
+                            _StdOut.advanceLine();
+                            _StdOut.putText("Maybe try a red or blue pill?");
+                    }
+                } else {
+                    _StdOut.putText("There are no more pills. Your decision has been made.");
+                }
+            } else {
+                _StdOut.putText("All I'm offering is the truth");
+                _StdOut.advanceLine();
+                _StdOut.putText("Once one chooses the red or blue pill, the choice is irreversible.");
+            }
+        }
     }
 }
