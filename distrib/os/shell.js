@@ -285,16 +285,7 @@ var TSOS;
         };
         Shell.prototype.shellDate = function (args) {
             var currDate = new Date();
-            _StdOut.putText("Current Date and Time: " + (currDate.getMonth() + 1) + "/" + currDate.getDate() + "/" + currDate.getFullYear());
-            _StdOut.putText(" ");
-            // begone military time, you are not allowed here
-            var hours = currDate.getHours(); // TODO: make a leading 0 for minutes less than 10
-            if (hours < 12) {
-                _StdOut.putText(hours + ":" + currDate.getMinutes() + "AM");
-            }
-            else {
-                _StdOut.putText((hours - 12) + ":" + currDate.getMinutes() + "PM");
-            }
+            _StdOut.putText(currDate.toLocaleString('en-US'));
         };
         Shell.prototype.shellLocation = function (args) {
             _StdOut.putText("You are in a vat, while your brain \"reads\" a simulated computer screen.");

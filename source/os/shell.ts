@@ -335,17 +335,7 @@ module TSOS {
 
         public shellDate(args: string[]) {
             var currDate = new Date();
-            _StdOut.putText("Current Date and Time: " + (currDate.getMonth() + 1) + "/" + currDate.getDate() + "/" + currDate.getFullYear());
-            _StdOut.putText(" ");
-            // begone military time, you are not allowed here
-
-            // TODO: add a leading 0 for minutes less than 10
-            var hours = currDate.getHours();
-            if (hours < 12) {
-                _StdOut.putText(hours + ":" + currDate.getMinutes() + "AM");
-            } else {
-                _StdOut.putText((hours - 12 ) + ":" + currDate.getMinutes() + "PM");
-            }
+            _StdOut.putText(currDate.toLocaleString('en-US'));
         }
 
         public shellLocation(args: string[]) {
