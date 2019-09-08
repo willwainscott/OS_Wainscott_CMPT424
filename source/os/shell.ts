@@ -252,7 +252,7 @@ module TSOS {
                 var topic = args[0];
                 switch (topic) {
                     case "ver":
-                        _StdOut.putText("Ver displays the current version of the TSOS.");
+                        _StdOut.putText("Ver displays the current version of the " + APP_NAME + ".");
                         break;
                     case "help":
                         _StdOut.putText("Help displays a list of (hopefully) valid commands.");
