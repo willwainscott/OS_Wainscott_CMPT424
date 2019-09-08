@@ -1,0 +1,22 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{OS Lab1 Questions}
+\author{Will Wainscott}
+\date{September 9th 2019}
+
+\begin{document}
+
+\maketitle
+
+\section{What are the advantages and disadvantages of using the
+same system call interface for manipulating both files and 
+devices?}
+
+The advantage of using the same system call interface for the manipulation of both files and devices revolve around the similarity of their uses. Both files and devices can be read, written to, and manipulated in similar ways. The system calls for files and devices resemble on another that certain operating systems will combine them into the same file-device structure for certain I/O devices. By using the same system call interface, the user can control the devices and the files to better serve their programs. The disadvantages of using the same system call interface is that files are often much simpler than devices. It may be limiting to restrict devices to the same interface as the files, leading to certain devices losing their true capabilities. 
+
+\section{Would it be possible for the user to develop a new command interpreter using the system call interface provided by the operating system? How?}
+
+It is entirely possible for a user to develop a new command interpreter using the OS's system call interface. The user has access to a number of helpful system calls that would allow the creation of a new command interpreter. Through the process control system calls, the user can control which programs run and when, as well as their low level functionality. They can also control files and devices and the way that the communicate with each other or other programs. 
+
+\end{document}
