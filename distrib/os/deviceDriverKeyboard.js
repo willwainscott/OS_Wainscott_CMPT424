@@ -55,10 +55,143 @@ var TSOS;
                 // TODO: Check for caps-lock and handle as shifted if so.
                 _KernelInputQueue.enqueue(chr);
             }
-            else if (((keyCode >= 48) && (keyCode <= 57)) || // digits
-                (keyCode == 32) || // space
+            else if ((keyCode == 32) || // space
                 (keyCode == 13)) { // enter
                 chr = String.fromCharCode(keyCode);
+                _KernelInputQueue.enqueue(chr);
+            }
+            else if ((keyCode >= 48) && (keyCode <= 57)) { //numbers and their shifted characters
+                if (isShifted) {
+                    switch (keyCode) {
+                        case 48:
+                            chr = ")";
+                            break;
+                        case 49:
+                            chr = "!";
+                            break;
+                        case 50:
+                            chr = "@";
+                            break;
+                        case 51:
+                            chr = "#";
+                            break;
+                        case 52:
+                            chr = "$";
+                            break;
+                        case 53:
+                            chr = "%";
+                            break;
+                        case 54:
+                            chr = "^";
+                            break;
+                        case 55:
+                            chr = "&";
+                            break;
+                        case 56:
+                            chr = "*";
+                            break;
+                        case 57:
+                            chr = "(";
+                            break;
+                    }
+                }
+                else {
+                    chr = String.fromCharCode(keyCode);
+                }
+                _KernelInputQueue.enqueue(chr);
+            }
+            else if (((keyCode >= 186) && (keyCode <= 192)) || //special characters and stuff
+                ((keyCode >= 219) && (keyCode <= 222))) { //more special stuff
+                switch (keyCode) {
+                    case 186:
+                        if (isShifted) {
+                            chr = ":";
+                        }
+                        else {
+                            chr = ";";
+                        }
+                        break;
+                    case 187:
+                        if (isShifted) {
+                            chr = "+";
+                        }
+                        else {
+                            chr = "=";
+                        }
+                        break;
+                    case 188:
+                        if (isShifted) {
+                            chr = "<";
+                        }
+                        else {
+                            chr = ",";
+                        }
+                        break;
+                    case 189:
+                        if (isShifted) {
+                            chr = "_";
+                        }
+                        else {
+                            chr = "-";
+                        }
+                        break;
+                    case 190:
+                        if (isShifted) {
+                            chr = ">";
+                        }
+                        else {
+                            chr = ".";
+                        }
+                        break;
+                    case 191:
+                        if (isShifted) {
+                            chr = "?";
+                        }
+                        else {
+                            chr = "/";
+                        }
+                        break;
+                    case 192:
+                        if (isShifted) {
+                            chr = "~";
+                        }
+                        else {
+                            chr = "`";
+                        }
+                        break;
+                    case 219:
+                        if (isShifted) {
+                            chr = "{";
+                        }
+                        else {
+                            chr = "[";
+                        }
+                        break;
+                    case 220:
+                        if (isShifted) {
+                            chr = "|";
+                        }
+                        else {
+                            chr = "\\";
+                        }
+                        break;
+                    case 221:
+                        if (isShifted) {
+                            chr = "}";
+                        }
+                        else {
+                            chr = "]";
+                        }
+                        break;
+                    case 222:
+                        if (isShifted) {
+                            chr = "\"";
+                        }
+                        else {
+                            chr = "'";
+                        }
+                        break;
+                }
                 _KernelInputQueue.enqueue(chr);
             }
         };
