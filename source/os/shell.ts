@@ -92,6 +92,11 @@ module TSOS {
                                   "<red | blue> - Take the red or blue pill.");
             this.commandList[this.commandList.length] = sc;
 
+            //status
+            sc = new ShellCommand(this.shellStatus,
+                                  "status",
+                                  "<string> - Changes the current status");
+            this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -284,6 +289,9 @@ module TSOS {
                     case "pill":
                         _StdOut.putText("Take the red or blue pill to decide your fate.");
                         break;
+                    case "status":
+                        _StdOut.putText("Changes the displayed status.")
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -367,6 +375,18 @@ module TSOS {
                 _StdOut.putText("All I'm offering is the truth");
                 _StdOut.advanceLine();
                 _StdOut.putText("Once one chooses the red or blue pill, the choice is irreversible.");
+            }
+        }
+
+        public shellStatus(args: string[]){
+            if (args.length > 0){
+                let status = "";
+                for (var word of args){
+                    status = status + word + " ";
+                }
+                Control.hostStatusChange(status);
+            } else {
+                _StdOut.putText("Please enter a status message.");
             }
         }
     }

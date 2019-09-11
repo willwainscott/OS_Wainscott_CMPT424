@@ -55,6 +55,9 @@ var TSOS;
             //pill
             sc = new TSOS.ShellCommand(this.shellPill, "pill", "<red | blue> - Take the red or blue pill.");
             this.commandList[this.commandList.length] = sc;
+            //status
+            sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Changes the current status");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             // Display the initial prompt.
@@ -233,6 +236,9 @@ var TSOS;
                     case "pill":
                         _StdOut.putText("Take the red or blue pill to decide your fate.");
                         break;
+                    case "status":
+                        _StdOut.putText("Changes the displayed status.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -317,6 +323,19 @@ var TSOS;
                 _StdOut.putText("All I'm offering is the truth");
                 _StdOut.advanceLine();
                 _StdOut.putText("Once one chooses the red or blue pill, the choice is irreversible.");
+            }
+        };
+        Shell.prototype.shellStatus = function (args) {
+            if (args.length > 0) {
+                var status_1 = "";
+                for (var _i = 0, args_1 = args; _i < args_1.length; _i++) {
+                    var word = args_1[_i];
+                    status_1 = status_1 + word + " ";
+                }
+                TSOS.Control.hostStatusChange(status_1);
+            }
+            else {
+                _StdOut.putText("Please enter a status message.");
             }
         };
         return Shell;

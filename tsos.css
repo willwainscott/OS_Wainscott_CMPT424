@@ -1,5 +1,9 @@
 /* TSOS.css */
 
+#divHeader p{
+    visibility: hidden;
+}
+
 body {
   background: #909193 url(distrib/images/linen.png) repeat;
   font-family: Helvetica, Verdana, Arial, sans-serif;
@@ -28,6 +32,11 @@ h3 {
   font-size: 16pt;
   font-weight: normal;
   font-style: normal;
+}
+
+h4 {
+    font-size:20pt;
+    margin-bottom:0px;
 }
 
 #display {
