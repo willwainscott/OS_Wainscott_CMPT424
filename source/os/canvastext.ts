@@ -191,9 +191,9 @@ module TSOS {
             var total = 0;
 
             //create height and width var
-            let height = size + _FontHeightMargin;
+            let height = size + this.descent(font,size) + (_FontHeightMargin * 2);
             let width = this.measure(font, size, char);
-            let newY = y - size;
+            let newY = y - size - _FontHeightMargin;
             //clear the rectangle with the dimensions of the letter
             ctx.clearRect(x,newY,width,height);
 

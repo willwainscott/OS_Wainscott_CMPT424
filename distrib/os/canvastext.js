@@ -84,9 +84,9 @@ var TSOS;
         CanvasTextFunctions.erase = function (ctx, font, size, x, y, char) {
             var total = 0;
             //create height and width var
-            var height = size + _FontHeightMargin;
+            var height = size + this.descent(font, size) + (_FontHeightMargin * 2);
             var width = this.measure(font, size, char);
-            var newY = y - size;
+            var newY = y - size - _FontHeightMargin;
             //clear the rectangle with the dimensions of the letter
             ctx.clearRect(x, newY, width, height);
             return total;
