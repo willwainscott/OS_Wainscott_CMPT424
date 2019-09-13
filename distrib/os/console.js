@@ -48,9 +48,31 @@ var TSOS;
                         var lastChar = this.buffer[this.buffer.length - 1];
                         this.removeChar(lastChar);
                         //remove the last letter in the buffer
-                        console.log(this.buffer);
                         this.buffer = this.buffer.slice(0, -1);
-                        console.log(this.buffer);
+                    }
+                }
+                else if (chr === String.fromCharCode(9)) { // Tab
+                    if (this.buffer.length > 0) { //if there is something in the buffer
+                        // get list of possible commands
+                        var completionOptions = _OsShell.commandList;
+                        // check each letter of buffer against an updated potential command list
+                        for (var i = 0; i < this.buffer.length; i++) {
+                            /* this updates the list of potential commands based on the letters,
+                            moving to the next letter each time there is more than two possible commands */
+                            completionOptions = this.completionCheck(this.buffer, completionOptions, i);
+                            if (completionOptions.length == 0) { // stop loop if there are no matches
+                                break;
+                            }
+                            else if (completionOptions.length == 1) { // put the matching command into the buffer
+                                //removes old buffer from canvas
+                                this.removeString(this.buffer);
+                                //changes new buffer to full command
+                                this.buffer = completionOptions[0].command;
+                                this.putText(this.buffer);
+                                break;
+                            }
+                        }
+                        // TODO: make tabing with arguments not go back to just the command
                     }
                 }
                 else {
@@ -86,6 +108,25 @@ var TSOS;
             this.currentXPosition = this.currentXPosition - offset;
             // remove char function
             _DrawingContext.eraseText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, char);
+        };
+        Console.prototype.removeString = function (string) {
+            // removes a string from the canvas letter by letter
+            // probably a much better way of doing this
+            while (string.length > 0) {
+                this.removeChar(string[string.length - 1]);
+                string = string.slice(0, -1);
+            }
+        };
+        Console.prototype.completionCheck = function (buffer, commandArray, index) {
+            // returns an array of the commands with matching letter as the buffer in a given index
+            var matchingCommands = [];
+            for (var _i = 0, commandArray_1 = commandArray; _i < commandArray_1.length; _i++) {
+                var sc = commandArray_1[_i];
+                if (sc.command[index] == buffer[index]) {
+                    matchingCommands[matchingCommands.length] = sc;
+                }
+            }
+            return matchingCommands;
         };
         Console.prototype.advanceLine = function () {
             this.currentXPosition = 0;
