@@ -42,6 +42,17 @@ var TSOS;
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
+                else if (chr === String.fromCharCode(8)) { // backspace
+                    if (this.buffer.length > 0) { //if there is something in the buffer
+                        //get the last character typed and erase it from the canvas
+                        var lastChar = this.buffer[this.buffer.length - 1];
+                        this.removeChar(lastChar);
+                        //remove the last letter in the buffer
+                        console.log(this.buffer);
+                        this.buffer = this.buffer.slice(0, -1);
+                        console.log(this.buffer);
+                    }
+                }
                 else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -68,6 +79,14 @@ var TSOS;
                 this.currentXPosition = this.currentXPosition + offset;
             }
         };
+        Console.prototype.removeChar = function (char) {
+            // Used when removing a character from the canvas after the backspace button has been hit
+            //move the cursor back
+            var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, char);
+            this.currentXPosition = this.currentXPosition - offset;
+            // remove char function
+            _DrawingContext.eraseText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, char);
+        };
         Console.prototype.advanceLine = function () {
             this.currentXPosition = 0;
             /*
@@ -79,6 +98,10 @@ var TSOS;
                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                 _FontHeightMargin;
             // TODO: Handle scrolling. (iProject 1)
+            if (this.currentYPosition > _Canvas.height) {
+                console.log("too far");
+                //Take image of canvas, shift it up some amount specified by the margins and stuff
+            }
         };
         return Console;
     }());
