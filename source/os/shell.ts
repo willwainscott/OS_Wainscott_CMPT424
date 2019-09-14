@@ -250,6 +250,7 @@ module TSOS {
         public shellCls(args: string[]) {         
             _StdOut.clearScreen();     
             _StdOut.resetXY();
+            _StdOut.resetBufferHistory();
         }
 
         public shellMan(args: string[]) {

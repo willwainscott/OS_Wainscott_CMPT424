@@ -198,6 +198,7 @@ var TSOS;
         Shell.prototype.shellCls = function (args) {
             _StdOut.clearScreen();
             _StdOut.resetXY();
+            _StdOut.resetBufferHistory();
         };
         Shell.prototype.shellMan = function (args) {
             if (args.length > 0) {

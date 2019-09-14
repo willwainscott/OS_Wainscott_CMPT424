@@ -13,6 +13,8 @@ module TSOS {
                     public currentFontSize = _DefaultFontSize,
                     public currentXPosition = 0,
                     public currentYPosition = _DefaultFontSize,
+                    public bufferHistory = [""], // oldest entries are at the front, "" is used to signify the buffer the user hasn't entered yet
+                    public historyIndex = 0,
                     public buffer = "") {
         }
 
@@ -30,6 +32,11 @@ module TSOS {
             this.currentYPosition = this.currentFontSize;
         }
 
+        public resetBufferHistory(): void {
+            this.bufferHistory = [""];
+            this.historyIndex = 0;
+        }
+
         public handleInput(): void {
             while (_KernelInputQueue.getSize() > 0) {
                 // Get the next character from the kernel input queue.
@@ -37,6 +44,10 @@ module TSOS {
                 // Check to see if it's "special" (enter or ctrl-c) or "normal" (anything else that the keyboard device driver gave us).
                 if (chr === String.fromCharCode(13)) { // the Enter key
                     // The enter key marks the end of a console command, so ...
+                    // ... add it to the buffer history ...
+                    this.bufferHistory.splice(this.bufferHistory.length - 1, 0, this.buffer);
+                    // ... reset buffer history to start back at the most recent buffer
+                    this.historyIndex = this.bufferHistory.length - 1;
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
@@ -70,6 +81,34 @@ module TSOS {
                             }
                         }
                     // TODO: make tabing with arguments not go back to just the command
+                    }
+                } else if (chr === String.fromCharCode(38)) {   // up arrow
+                    if ((this.historyIndex <= (this.bufferHistory.length - 1))  && // the index is not the last
+                               (this.bufferHistory.length > 1)  &&                        // there is a history
+                               (this.historyIndex != 0))  {                               // the index is not the first
+                        //clear the buffer
+                        this.removeString(this.buffer);
+                        this.buffer = "";
+                        // move back one entry
+                        this.historyIndex--;
+                        // write out old buffer
+                        this.putText(this.bufferHistory[this.historyIndex]);
+                        // actually put it into the new buffer
+                        this.buffer = this.bufferHistory[this.historyIndex];
+
+                    }
+                } else if (chr === String.fromCharCode(40)) { //down arrow
+                    if (this.historyIndex != this.bufferHistory.length - 1) {
+                        // if its not the last index ("")
+                        //clear the buffer
+                        this.removeString(this.buffer);
+                        this.buffer = "";
+                        // move up one entry
+                        this.historyIndex++;
+                        // write out old buffer
+                        this.putText(this.bufferHistory[this.historyIndex]);
+                        // actually put it into the new buffer
+                        this.buffer = this.bufferHistory[this.historyIndex];
                     }
                 } else {
                     // This is a "normal" character, so ...
