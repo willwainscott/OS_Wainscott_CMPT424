@@ -177,13 +177,20 @@ var TSOS;
              * Font descent measures from the baseline to the lowest point in the font.
              * Font height margin is extra spacing between the lines.
              */
-            this.currentYPosition += _DefaultFontSize +
+            var lineHeight = _DefaultFontSize +
                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                 _FontHeightMargin;
+            this.currentYPosition += lineHeight;
             // TODO: Handle scrolling. (iProject 1)
             if (this.currentYPosition > _Canvas.height) {
-                console.log("too far");
-                //Take image of canvas, shift it up some amount specified by the margins and stuff
+                //take image of canvas except for the top line, leaving room at the bottom
+                var screenshot = _DrawingContext.getImageData(0, lineHeight, _Canvas.width, _Canvas.height);
+                //clear that screen
+                this.clearScreen();
+                // put the image of the canvas back on the screen
+                _DrawingContext.putImageData(screenshot, 0, 0);
+                // move the y value to the correct spot
+                this.currentYPosition = this.currentYPosition - lineHeight;
             }
         };
         return Console;
