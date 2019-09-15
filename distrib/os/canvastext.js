@@ -81,6 +81,16 @@ var TSOS;
             ctx.restore();
             return total;
         };
+        CanvasTextFunctions.erase = function (ctx, font, size, x, y, char) {
+            var total = 0;
+            //create height and width var
+            var height = size + this.descent(font, size) + (_FontHeightMargin * 2);
+            var width = this.measure(font, size, char);
+            var newY = y - size - _FontHeightMargin;
+            //clear the rectangle with the dimensions of the letter
+            ctx.clearRect(x, newY, width, height);
+            return total;
+        };
         CanvasTextFunctions.enable = function (ctx) {
             ctx.drawText = function (font, size, x, y, text) { return CanvasTextFunctions.draw(ctx, font, size, x, y, text); };
             ctx.measureText = function (font, size, text) { return CanvasTextFunctions.measure(font, size, text); };
@@ -94,6 +104,7 @@ var TSOS;
                 var w = CanvasTextFunctions.measure(font, size, text);
                 return CanvasTextFunctions.draw(ctx, font, size, x - w / 2, y, text);
             };
+            ctx.eraseText = function (font, size, x, y, char) { return CanvasTextFunctions.erase(ctx, font, size, x, y, char); };
         };
         CanvasTextFunctions.symbols = {
             ' ': { width: 16, points: [] },

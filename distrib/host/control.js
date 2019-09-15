@@ -26,6 +26,8 @@ var TSOS;
             // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
             // Get a global reference to the canvas.  TODO: Should we move this stuff into a Display Device Driver?
             _Canvas = document.getElementById('display');
+            // Get global reference to the user code input
+            _UserCodeTextArea = document.getElementById('taProgramInput');
             // Get a global reference to the drawing context.
             _DrawingContext = _Canvas.getContext("2d");
             // Enable the added-in canvas text functions (see canvastext.ts for provenance and details).
@@ -58,6 +60,11 @@ var TSOS;
             taLog.value = str + taLog.value;
             // TODO in the future: Optionally update a log database or some streaming service.
         };
+        // Updates the time, called on a CPU clock pulse
+        Control.updateTime = function () {
+            var dateTime = new Date();
+            document.getElementById("pDateTime").innerHTML = dateTime.toLocaleString('en-US');
+        };
         //
         // Host Events
         //
@@ -77,6 +84,9 @@ var TSOS;
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new TSOS.Kernel();
             _Kernel.krnBootstrap(); // _GLaDOS.afterStartup() will get called in there, if configured.
+            // Make Status and Time visible
+            document.getElementById("pDateTime").style.visibility = "visible";
+            document.getElementById("pStatus").style.visibility = "visible";
         };
         Control.hostBtnHaltOS_click = function (btn) {
             Control.hostLog("Emergency halt", "host");
@@ -93,6 +103,9 @@ var TSOS;
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
+        };
+        Control.hostStatusChange = function (status) {
+            document.getElementById("pStatus").innerHTML = "Status: " + status;
         };
         return Control;
     }());

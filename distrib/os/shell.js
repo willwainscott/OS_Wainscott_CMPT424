@@ -55,6 +55,15 @@ var TSOS;
             //pill
             sc = new TSOS.ShellCommand(this.shellPill, "pill", "<red | blue> - Take the red or blue pill.");
             this.commandList[this.commandList.length] = sc;
+            //status
+            sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Changes the current status.");
+            this.commandList[this.commandList.length] = sc;
+            //error
+            sc = new TSOS.ShellCommand(this.shellError, "error", "- Simulates an OS error.");
+            this.commandList[this.commandList.length] = sc;
+            //load
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Loads entered user code.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             // Display the initial prompt.
@@ -195,6 +204,7 @@ var TSOS;
         Shell.prototype.shellCls = function (args) {
             _StdOut.clearScreen();
             _StdOut.resetXY();
+            _StdOut.resetBufferHistory();
         };
         Shell.prototype.shellMan = function (args) {
             if (args.length > 0) {
@@ -232,6 +242,15 @@ var TSOS;
                         break;
                     case "pill":
                         _StdOut.putText("Take the red or blue pill to decide your fate.");
+                        break;
+                    case "status":
+                        _StdOut.putText("Changes the displayed status.");
+                        break;
+                    case "error":
+                        _StdOut.putText("Simulates an OS error and violently dies.");
+                        break;
+                    case "load":
+                        _StdOut.putText("Loads user code entered into the text area.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -317,6 +336,71 @@ var TSOS;
                 _StdOut.putText("All I'm offering is the truth");
                 _StdOut.advanceLine();
                 _StdOut.putText("Once one chooses the red or blue pill, the choice is irreversible.");
+            }
+        };
+        Shell.prototype.shellStatus = function (args) {
+            if (args.length > 0) {
+                var status_1 = "";
+                for (var _i = 0, args_1 = args; _i < args_1.length; _i++) {
+                    var word = args_1[_i];
+                    status_1 = status_1 + word + " ";
+                }
+                TSOS.Control.hostStatusChange(status_1);
+            }
+            else {
+                _StdOut.putText("Please enter a status message.");
+            }
+        };
+        Shell.prototype.shellError = function (args) {
+            _Kernel.krnTrapError("Test Error");
+        };
+        Shell.prototype.shellLoad = function (args) {
+            var userCode = _UserCodeTextArea.value;
+            var valid = true;
+            var charArray = userCode.split(''); //makes array of every char the user entered
+            var stringArray = userCode.split(' '); // makes array of every space seperated string
+            for (var _i = 0, charArray_1 = charArray; _i < charArray_1.length; _i++) {
+                var char = charArray_1[_i];
+                switch (char) { //checks to make sure only hex digits were entered
+                    case " ": break;
+                    case "0": break;
+                    case "1": break;
+                    case "2": break;
+                    case "3": break;
+                    case "4": break;
+                    case "5": break;
+                    case "6": break;
+                    case "7": break;
+                    case "8": break;
+                    case "9": break;
+                    case "A": break;
+                    case "B": break;
+                    case "C": break;
+                    case "D": break;
+                    case "E": break;
+                    case "F": break;
+                    default:
+                        console.log("invalid hex digits");
+                        valid = false;
+                }
+            }
+            for (var _a = 0, stringArray_1 = stringArray; _a < stringArray_1.length; _a++) { //checks to make sure that the entered hex digits are valid codes
+                var hexNumberString = stringArray_1[_a];
+                if (!valid) { // if its already invalid due to prior loop, break out so we dont loop through
+                    break;
+                }
+                else if (hexNumberString.length != 2) {
+                    console.log("invalid hex commands");
+                    valid = false;
+                    break;
+                }
+            }
+            if (valid) {
+                _StdOut.putText("User Code Successfully loaded.");
+                // Do something with the code
+            }
+            else {
+                _StdOut.putText("Please ensure user code is valid hexadecimal");
             }
         };
         return Shell;

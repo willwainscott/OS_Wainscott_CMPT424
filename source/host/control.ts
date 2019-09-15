@@ -28,6 +28,9 @@ module TSOS {
             // Get a global reference to the canvas.  TODO: Should we move this stuff into a Display Device Driver?
             _Canvas = <HTMLCanvasElement>document.getElementById('display');
 
+            // Get global reference to the user code input
+            _UserCodeTextArea = <HTMLTextAreaElement>document.getElementById('taProgramInput');
+
             // Get a global reference to the drawing context.
             _DrawingContext = _Canvas.getContext("2d");
 
@@ -69,6 +72,12 @@ module TSOS {
             // TODO in the future: Optionally update a log database or some streaming service.
         }
 
+        // Updates the time, called on a CPU clock pulse
+        public static updateTime() {
+            var dateTime = new Date();
+            document.getElementById("pDateTime").innerHTML = dateTime.toLocaleString('en-US');
+        }
+
 
         //
         // Host Events
@@ -93,6 +102,10 @@ module TSOS {
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new Kernel();
             _Kernel.krnBootstrap();  // _GLaDOS.afterStartup() will get called in there, if configured.
+
+            // Make Status and Time visible
+            document.getElementById("pDateTime").style.visibility = "visible";
+            document.getElementById("pStatus").style.visibility = "visible";
         }
 
         public static hostBtnHaltOS_click(btn): void {
@@ -112,5 +125,10 @@ module TSOS {
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
         }
+
+        public static hostStatusChange(status): void {
+            document.getElementById("pStatus").innerHTML = "Status: " + status;
+        }
+
     }
 }
