@@ -1,0 +1,16 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{OS Lab2 Questions}
+\author{Will Wainscott}
+\date{16 September 2019}
+
+\begin{document}
+
+\maketitle
+
+\section{How is your console like the ancient TTY subsystem in Unix?}
+
+The console for this project is similar to the TTY subsystem. While the OS runs in the background and is constantly doing something, the console waits for some sort of user input. It is waiting until a letter is typed, or some other interrupt is registered. This is like the TTY, which is described as a passive system, waiting for some sort of interrupt call. The TTY also only really keeps track of the foreground processes, and as of right now our console only focuses on what the user can see and interact with.
+
+\end{document}
