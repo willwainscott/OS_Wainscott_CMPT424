@@ -56,7 +56,10 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellPill, "pill", "<red | blue> - Take the red or blue pill.");
             this.commandList[this.commandList.length] = sc;
             //status
-            sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Changes the current status");
+            sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Changes the current status.");
+            this.commandList[this.commandList.length] = sc;
+            //error
+            sc = new TSOS.ShellCommand(this.shellError, "error", "- Simulates an OS error.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -240,6 +243,9 @@ var TSOS;
                     case "status":
                         _StdOut.putText("Changes the displayed status.");
                         break;
+                    case "error":
+                        _StdOut.putText("Simulates an OS error and violently dies.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -338,6 +344,9 @@ var TSOS;
             else {
                 _StdOut.putText("Please enter a status message.");
             }
+        };
+        Shell.prototype.shellError = function (args) {
+            _Kernel.krnTrapError("Test Error");
         };
         return Shell;
     }());

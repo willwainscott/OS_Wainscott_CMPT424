@@ -95,7 +95,13 @@ module TSOS {
             //status
             sc = new ShellCommand(this.shellStatus,
                                   "status",
-                                  "<string> - Changes the current status");
+                                  "<string> - Changes the current status.");
+            this.commandList[this.commandList.length] = sc;
+
+            //error
+            sc = new ShellCommand(this.shellError,
+                                  "error",
+                                  "- Simulates an OS error.");
             this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
@@ -293,6 +299,9 @@ module TSOS {
                     case "status":
                         _StdOut.putText("Changes the displayed status.")
                         break;
+                    case "error":
+                        _StdOut.putText("Simulates an OS error and violently dies.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -389,6 +398,10 @@ module TSOS {
             } else {
                 _StdOut.putText("Please enter a status message.");
             }
+        }
+
+        public shellError(args: string[]){
+            _Kernel.krnTrapError("Test Error");
         }
     }
 }

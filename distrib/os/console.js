@@ -193,6 +193,31 @@ var TSOS;
                 this.currentYPosition = this.currentYPosition - lineHeight;
             }
         };
+        Console.prototype.RSOD = function () {
+            //clear screen
+            this.clearScreen();
+            // make the screen red
+            _DrawingContext.fillStyle = 'red';
+            _DrawingContext.fillRect(0, 0, 500, 500); // Hard coding is not the best, but is DOM stuff in the OS any better?
+            // _DrawingContext.fillRect(0, 0, document.getElementById("display").width, document.getElementById("display").height);
+            //reset Y position so you can see...
+            this.currentYPosition = 100; // Just a random number, no real significance
+            // ... some flavorful text!
+            this.putText("Oh no...Something broke.");
+            this.advanceLine();
+            if (_SarcasticMode) {
+                this.putText("What did you do???");
+                this.advanceLine();
+                this.putText("You've really done it now.");
+                this.advanceLine();
+                this.putText("You monster.");
+            }
+            else {
+                this.putText("Well this is embarrassing.");
+                this.advanceLine();
+                this.putText("We apologize for this inconvenience.");
+            }
+        };
         return Console;
     }());
     TSOS.Console = Console;
