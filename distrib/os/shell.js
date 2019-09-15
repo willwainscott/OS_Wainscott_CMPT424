@@ -49,8 +49,8 @@ var TSOS;
             // date
             sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date and time.");
             this.commandList[this.commandList.length] = sc;
-            //location
-            sc = new TSOS.ShellCommand(this.shellLocation, "loc", "- Displays the user's current location.");
+            //whereami
+            sc = new TSOS.ShellCommand(this.shellLocation, "whereami", "- Displays the user's current location.");
             this.commandList[this.commandList.length] = sc;
             //pill
             sc = new TSOS.ShellCommand(this.shellPill, "pill", "<red | blue> - Take the red or blue pill.");
@@ -237,7 +237,7 @@ var TSOS;
                     case "date":
                         _StdOut.putText("Displays the current date and time. Like clockwork.");
                         break;
-                    case "loc":
+                    case "whereami":
                         _StdOut.putText("Tells the user where they physically are.");
                         break;
                     case "pill":

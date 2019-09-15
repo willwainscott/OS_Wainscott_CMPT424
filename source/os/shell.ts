@@ -80,9 +80,9 @@ module TSOS {
                                   "- Displays the current date and time.");
             this.commandList[this.commandList.length] = sc;
 
-            //location
+            //whereami
             sc = new ShellCommand(this.shellLocation,
-                                  "loc",
+                                  "whereami",
                                   "- Displays the user's current location.");
             this.commandList[this.commandList.length] = sc;
 
@@ -296,7 +296,7 @@ module TSOS {
                     case "date":
                         _StdOut.putText("Displays the current date and time. Like clockwork.");
                         break;
-                    case "loc":
+                    case "whereami":
                         _StdOut.putText("Tells the user where they physically are.");
                         break;
                     case "pill":
