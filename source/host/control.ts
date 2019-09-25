@@ -97,6 +97,14 @@ module TSOS {
             _CPU = new Cpu();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init();       //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
 
+            // ... Create some memory because...uh...i forgot why ...
+            _Memory = new Memory();
+            _Memory.init();
+            // ... oh yeah cause its part of the hardware ...
+            // ... throw an Accessor in there while your at it so we can access our new memory ...
+            _MemoryAccessor = new MemoryAccessor();
+
+
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
