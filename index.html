@@ -32,7 +32,7 @@
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment the line below to enable GLaDOS testing. -->
    <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip2.js"></script> -->
-   
+
 </head>
 
 <body onload="onDocumentLoad()">
@@ -73,7 +73,7 @@
              onclick="TSOS.Control.hostBtnReset_click(this);">
    </div>
 
-   <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
+   <div id="divConsole" style="margin:4px; margin-top:19px; width:500px; height:500px; float:left;">
       <canvas id="display"
               width="500px"
               height="500px"
@@ -81,19 +81,20 @@
       </canvas>
    </div>
 
-   <div id="divLog" style="margin-left:520px;">
+
+   <div id="divLog" style="margin-left:520px; width:30%">
       <label>
          Host Log
          <br>
          <textarea name="taHostLog"
                    id  ="taHostLog"
-                   rows="26"
+                   rows="10"
                    cols="48"
          ></textarea>
       </label>
    </div>
 
-   <div id="divUserProgramInput" style="margin-left:520px;">
+   <div id="divUserProgramInput" style="margin-left: 520px; width:30%">
       <label>
          User Program Input
          <br>
@@ -104,6 +105,422 @@
          ></textarea>
       </label>
    </div>
+
+   <div id="divCPU" style="margin-left: 520px; width:30%">
+      <label>CPU</label>
+      <div id="divCPUTable">
+         <table>
+            <tr>
+               <th>PC</th>
+               <th>IR</th>
+               <th>ACC</th>
+               <th>X</th>
+               <th>Y</th>
+               <th>Z</th>
+            </tr>
+            <tr>
+               <td>0</td>
+               <td>0</td>
+               <td>0</td>
+               <td>0</td>
+               <td>0</td>
+               <td>0</td>
+            </tr>
+         </table>
+      </div>
+   </div>
+
+   <div id="divMemory" style="margin-left: 520px; width:30%">
+      <label>Memory</label>
+      <div id="divMemoryTable" style="height:139px; overflow-y:scroll;">
+         <table>
+            <tr>
+               <td style="font-weight:bold;">0x000</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x008</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x010</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x018</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x020</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x028</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x030</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x038</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x040</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x048</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x050</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x058</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x060</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x068</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x070</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x078</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x080</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x088</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x090</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x098</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x0A0</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x0A8</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x0B0</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x0B8</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x0C0</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x0C8</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x0D0</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x0D8</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x0E0</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x0E8</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x0F0</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+            <tr>
+               <td style="font-weight:bold;">0x0F8</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+               <td>00</td>
+            </tr>
+         </table>
+      </div>
+
+   </div>
+
+   <div id="divProcesses" style="width:fit-content; margin:4px; float:right ">
+      <label>Processes</label>
+      <div id="divProcessTable"></div>
+      <table>
+         <tr>
+            <th>PID</th>
+            <th>PC</th>
+            <th>IR</th>
+            <th>ACC</th>
+            <th>X</th>
+            <th>Y</th>
+            <th>Z</th>
+            <th>State</th>
+            <th>Location</th>
+         </tr>
+         <tr>
+            <td>0</td>
+            <td>32</td>
+            <td>A9</td>
+            <td>79</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>Running</td>
+            <td>Memory</td>
+         </tr>
+      </table>
+   </div>
+
+
 </div>
 
 <p class="footerText" style="clear:both;">
