@@ -437,6 +437,12 @@ module TSOS {
                     case "D": break;
                     case "E": break;
                     case "F": break;
+                    case "a": break;
+                    case "b": break;
+                    case "c": break;
+                    case "d": break;
+                    case "e": break;
+                    case "f": break;
                     default: console.log("invalid hex digits"); valid = false;
                 }
             }
@@ -451,7 +457,10 @@ module TSOS {
             }
             if (valid) {
                 _StdOut.putText("User Code Successfully loaded.");
-                // Do something with the code
+                //Make every character in the codes uppercase
+                userCode = userCode.toUpperCase();
+                //load it into memory
+
             } else {
                 _StdOut.putText("Please ensure user code is valid hexadecimal");
             }
