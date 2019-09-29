@@ -110,6 +110,12 @@ module TSOS {
                                   "- Loads entered user code.");
             this.commandList[this.commandList.length] = sc;
 
+            //run
+            sc = new ShellCommand(this.shellRun,
+                                  "run",
+                                  "<PID> - Runs a process based on a given Process ID.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -311,7 +317,10 @@ module TSOS {
                         _StdOut.putText("Simulates an OS error and violently dies.");
                         break;
                     case "load":
-                        _StdOut.putText("Loads user code entered into the text area.");
+                        _StdOut.putText("Loads user code entered in the text area into memory.");
+                        break;
+                    case "run":
+                        _StdOut.putText("Runs a loaded program based on the Process ID.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -460,7 +469,13 @@ module TSOS {
                 }
             }
             if (valid) {
-                _StdOut.putText("User Code Successfully loaded.");
+                _StdOut.putText("Entered user code is valid.");
+                _StdOut.advanceLine();
+                // hehehe
+                if (_SarcasticMode){
+                    _StdOut.putText("Congrats, you're not completely useless.");
+                    _StdOut.advanceLine();
+                }
                 //Make every character in the codes uppercase
                 userCode = userCode.toUpperCase();
                 //load it into memory ...
@@ -473,6 +488,7 @@ module TSOS {
                                                        // of the memory, once we add the other two sections
                 // create a PCB
                 var PCB = new TSOS.PCB();
+                _PCBList[_PCBList.length] = PCB;
 
                 // print out response
                 _StdOut.putText("User code loaded successfully");
@@ -482,6 +498,12 @@ module TSOS {
             } else {
                 _StdOut.putText("Please ensure user code is valid hexadecimal");
             }
+        }
+
+        public shellRun(args: string[]) {
+            // Check to see if the entered PID is valid
+
+            //Run the program
         }
     }
 }
