@@ -37,7 +37,7 @@ module TSOS {
 
             // Make a new Memory Manager
             _MemoryManager = new MemoryManager();
-            
+
             //
             // ... more?
             //

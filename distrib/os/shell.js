@@ -132,6 +132,7 @@ var TSOS;
             var retVal = new TSOS.UserCommand();
             // 1. Remove leading and trailing spaces.
             buffer = TSOS.Utils.trim(buffer);
+            // W TODO: check the command after you trim, then make sure you want the args upper or lower
             // 2. Lower-case it.
             buffer = buffer.toLowerCase();
             // 3. Separate on spaces so we can determine the command and command-line args, if any.
@@ -356,9 +357,11 @@ var TSOS;
         };
         Shell.prototype.shellLoad = function (args) {
             var userCode = _UserCodeTextArea.value;
+            // remove and leading or trailing spaces
+            userCode = TSOS.Utils.trim(userCode);
             var valid = true;
             var charArray = userCode.split(''); //makes array of every char the user entered
-            var stringArray = userCode.split(' '); // makes array of every space seperated string
+            var stringArray = userCode.split(' '); // makes array of every space separated string
             for (var _i = 0, charArray_1 = charArray; _i < charArray_1.length; _i++) {
                 var char = charArray_1[_i];
                 switch (char) { //checks to make sure only hex digits were entered
@@ -395,7 +398,7 @@ var TSOS;
                 if (!valid) { // if its already invalid due to prior loop, break out so we dont loop through
                     break;
                 }
-                else if (hexNumberString.length != 2) {
+                else if (hexNumberString.length != 2) { // valid right now means just of length two
                     console.log("invalid hex commands");
                     valid = false;
                     break;
@@ -405,7 +408,18 @@ var TSOS;
                 _StdOut.putText("User Code Successfully loaded.");
                 //Make every character in the codes uppercase
                 userCode = userCode.toUpperCase();
-                //load it into memory
+                //load it into memory ...
+                //clear memory before loading
+                _MemoryManager.clearMemory(0, 255); //This is just the whole memory array for now, will change once we add more processes
+                //use memory manager to load
+                _MemoryManager.loadMemory(userCode, 0); //This accepts the starting index, will probably change to the section (1,2,or 3)
+                // of the memory, once we add the other two sections
+                // create a PCB
+                var PCB = new TSOS.PCB();
+                // print out response
+                _StdOut.putText("User code loaded successfully");
+                _StdOut.advanceLine();
+                _StdOut.putText("Process ID Number: " + PCB.PID);
             }
             else {
                 _StdOut.putText("Please ensure user code is valid hexadecimal");
