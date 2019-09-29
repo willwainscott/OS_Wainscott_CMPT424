@@ -37,6 +37,13 @@ module TSOS {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+
+            // Get the currentPCB and assign its values to corresponding cpu values
+
+            //Run the next code
+
+            // Put List of command codes here
+
         }
     }
 }

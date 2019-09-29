@@ -502,6 +502,18 @@ module TSOS {
 
         public shellRun(args: string[]) {
             // Check to see if the entered PID is valid
+            if (args.length > 0 && typeof args[0] === Number) { //Checks to see if the arg is there and is actually a number
+                if(args[0] < _PCBList.length && _PCBList[args[0]].state != "Terminated") { //Checks to see if the entered PID exists and hasn't been terminated
+                    //make the entered PCB the current PCB
+                    _CurrentPCB = _PCBList[args[0]];
+                    // make CPU.isExecuting to true
+                    _CPU.isExecuting = true;
+                } else {
+                    _StdOut.putText("Ensure the entered PID number is valid.")
+                }
+            } else {
+                _StdOut.putText("Please enter a PID number.")
+            }
 
             //Run the program
         }

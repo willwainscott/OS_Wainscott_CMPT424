@@ -12,7 +12,7 @@
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
 const APP_NAME: string    = "NASOS";   // Not a Simulation Operating System? Note: I hope changing this doesn't break everything that uses TSOS
-const APP_VERSION: string = "0.1";   // I assume this will be always updated and completely accurate
+const APP_VERSION: string = "0.2";   // I assume this will be always updated and completely accurate
 
 const CPU_CLOCK_INTERVAL: number = 100;   // This is in ms (milliseconds) so 1000 = 1 second.
 
@@ -32,6 +32,7 @@ var _MemoryAccessor: TSOS.MemoryAccessor;
 var _MemoryManager: any = null;
 
 var _PCBList: TSOS.PCB[] = [];
+var _CurrentPCB: TSOS.PCB = null;
 
 var _OSclock: number = 0;  // Page 23.
 

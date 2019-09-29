@@ -59,6 +59,7 @@ var TSOS;
                 (keyCode == 13) || // enter
                 (keyCode == 8) || // backspace
                 (keyCode == 9) || // tab
+                // W TODO: move up and down to their own else if statments to fix error
                 (keyCode == 38) || // up arrow
                 (keyCode == 40)) { // down arrow
                 chr = String.fromCharCode(keyCode);

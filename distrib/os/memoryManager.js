@@ -23,7 +23,6 @@ var TSOS;
             for (var i = startIndex; i < userInputArray.length; i++) {
                 _Memory.memoryArray[i] = userInputArray[i];
             }
-            console.log(_Memory.memoryArray);
         };
         return MemoryManager;
     }());
