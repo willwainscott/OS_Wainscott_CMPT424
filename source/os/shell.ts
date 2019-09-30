@@ -480,15 +480,21 @@ module TSOS {
                 userCode = userCode.toUpperCase();
                 //load it into memory ...
 
+                // create a PCB
+                var PCB = new TSOS.PCB();
+                PCB.section = _MemoryManager.assignMemorySection();
+                _PCBList[_PCBList.length] = PCB;
+                _ActivePCBList[_ActivePCBList.length] = PCB;
+
+
                 //clear memory before loading
                 _MemoryManager.clearMemory(0,255); //This is just the whole memory array for now, will change once we add more processes
 
                 //use memory manager to load
                 _MemoryManager.loadMemory(userCode,0); //This accepts the starting index, will probably change to the section (1,2,or 3)
                                                        // of the memory, once we add the other two sections
-                // create a PCB
-                var PCB = new TSOS.PCB();
-                _PCBList[_PCBList.length] = PCB;
+
+                // Update Memory GUI
 
                 // print out response
                 _StdOut.putText("User code loaded successfully");
@@ -502,10 +508,14 @@ module TSOS {
 
         public shellRun(args: string[]) {
             // Check to see if the entered PID is valid
-            if (args.length > 0 && typeof args[0] === Number) { //Checks to see if the arg is there and is actually a number
-                if(args[0] < _PCBList.length && _PCBList[args[0]].state != "Terminated") { //Checks to see if the entered PID exists and hasn't been terminated
+            if (args.length > 0 && !(isNaN(Number(args[0])))) { //Checks to see if the arg is there and is actually a number
+                var enteredPID = Number(args[0]);
+                // Checks to see if the PID exists and hasn't already been run or terminated
+                if(enteredPID < _PCBList.length && _PCBList[enteredPID].state != "Terminated" && _PCBList[enteredPID].state != "Complete") {
                     //make the entered PCB the current PCB
-                    _CurrentPCB = _PCBList[args[0]];
+                    _CurrentPCB = _PCBList[args[0]];  // This will eventually be replaced by the scheduler
+                    // change the PCB status to waiting
+                    _PCBList[args[0]].status = "Waiting"; // For P2 this could be "Running", but later (P3+) it wouldn't make sense
                     // make CPU.isExecuting to true
                     _CPU.isExecuting = true;
                 } else {

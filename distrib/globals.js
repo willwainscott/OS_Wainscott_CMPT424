@@ -25,6 +25,8 @@ var _Memory;
 var _MemoryAccessor;
 var _MemoryManager = null;
 var _PCBList = [];
+var _CurrentPCB = null;
+var _ActivePCBList = [];
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Canvas; // Initialized in Control.hostInit().

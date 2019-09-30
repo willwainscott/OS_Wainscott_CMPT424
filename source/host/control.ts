@@ -138,5 +138,11 @@ module TSOS {
             document.getElementById("pStatus").innerHTML = "Status: " + status;
         }
 
+        // Update Processes table
+
+        // Update CPU table
+
+        // Update Memory Table
+
     }
 }

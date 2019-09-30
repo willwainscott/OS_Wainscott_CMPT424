@@ -2,7 +2,7 @@
 
     Checks to see if there is available space of the user code to be entered into memory,
     also frees up space in the memory after the program is completed
-    Used to load codes int other memory
+    Used to load codes into other memory
 
    ------------------------ */
 
@@ -19,13 +19,26 @@ module TSOS {
             }
         }
 
-        public loadMemory(userInput, startIndex) {  //Start index may change to the start of the section of the memory
+        public loadMemory(userInput,section) {  //Start index may change to the start of the section of the memory
             // make array of the entered commands
             var userInputArray = userInput.split(" ");
             // load them into memory
-            for (var i = startIndex; i < userInputArray.length; i++){
+            for (var i = _MemoryAccessor.sectionToIndex(section); i < userInputArray.length; i++){
                 _Memory.memoryArray[i] = userInputArray[i];
             }
+        }
+
+        public assignMemorySection() {
+            var section = "";
+
+            // This is where we would check to see if there is something in memory in specfic sections
+            // Probably by checking the list of active PCBs for ones with the section strings of 1,2,3, and disk
+            // But thats a problem for iP3
+
+            var section = "1";
+
+            return section
+
         }
 
     }
