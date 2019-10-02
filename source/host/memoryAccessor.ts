@@ -27,8 +27,20 @@ module TSOS {
 
         }
 
+        public readMemoryToDecimal(section: string, PC: number) {
+            // returns a decimal representation of the next hex pair yet to be run/read
+            var hex: string = _Memory.memoryArray[this.sectionToIndex(section) + PC];
+            return Utils.hexStringToDecimal(hex);
+        }
+
+        public readMemoryToHex(section: string, PC: number) {
+            // return the actually hex string of the next hex pair yet to be run/read
+            var hex: string = _Memory.memoryArray[this.sectionToIndex(section) + PC];
+            return hex;
+        }
+
         public sectionToIndex(section) {
-            var i;
+            var i: number;
             switch (section) {
                 case "1":
                     i = 0;

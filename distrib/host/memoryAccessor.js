@@ -17,6 +17,16 @@ var TSOS;
             // This will be much more useful when there is more than one section in memory
             // For now it looks pretty simple
         };
+        MemoryAccessor.prototype.readMemoryToDecimal = function (section, PC) {
+            // returns a decimal representation of the next hex pair yet to be run/read
+            var hex = _Memory.memoryArray[this.sectionToIndex(section) + PC];
+            return TSOS.Utils.hexStringToDecimal(hex);
+        };
+        MemoryAccessor.prototype.readMemoryToHex = function (section, PC) {
+            // return the actually hex string of the next hex pair yet to be run/read
+            var hex = _Memory.memoryArray[this.sectionToIndex(section) + PC];
+            return hex;
+        };
         MemoryAccessor.prototype.sectionToIndex = function (section) {
             var i;
             switch (section) {

@@ -425,7 +425,17 @@ var TSOS;
                 var PCB = new TSOS.PCB();
                 PCB.section = _MemoryManager.assignMemorySection();
                 _PCBList[_PCBList.length] = PCB;
-                _ActivePCBList[_ActivePCBList.length] = PCB;
+                // For now we use this because we can only have one program in memory, and
+                // we want it to overwrite the existing program (like you said in class)
+                // and we shouldn't be able to run a program that isn't in memory, so we change its state to Terminated
+                if (_ActivePCBList.length > 1) { // If there is an active pcb (A process that hasn't been run yet)
+                    _PCBList[_PCBList.length - 1].state = "Terminated";
+                }
+                /*
+                _ActivePCBList[_ActivePCBList.length] = PCB;    //This will be helpful for later projects
+                */
+                _PCBList[_PCBList.length] = PCB;
+                _ActivePCBList[0] = PCB;
                 //clear memory before loading
                 _MemoryManager.clearMemory(0, 255); //This is just the whole memory array for now, will change once we add more processes
                 //use memory manager to load
@@ -448,7 +458,7 @@ var TSOS;
                 // Checks to see if the PID exists and hasn't already been run or terminated
                 if (enteredPID < _PCBList.length && _PCBList[enteredPID].state != "Terminated" && _PCBList[enteredPID].state != "Complete") {
                     //make the entered PCB the current PCB
-                    _CurrentPCB = _PCBList[args[0]]; // This will eventually be replaced by the scheduler
+                    _CurrentPCB = _ActivePCBList[args[0]]; // This will eventually be replaced by the scheduler
                     // change the PCB status to waiting
                     _PCBList[args[0]].status = "Waiting"; // For P2 this could be "Running", but later (P3+) it wouldn't make sense
                     // make CPU.isExecuting to true
