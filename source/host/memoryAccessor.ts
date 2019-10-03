@@ -27,11 +27,25 @@ module TSOS {
 
         }
 
-        public readMemoryToDecimal(section: string, PC: number) {
+        // We give this the section of the memory that the program is stored in, the process PC, and the amount of bytes we want to read
+        public readMemoryToDecimal(section: string, PC: number, bytes: number) {
             // returns a decimal representation of the next hex pair yet to be run/read
-            var hex: string = _Memory.memoryArray[this.sectionToIndex(section) + PC];
+            var hex: string = "";
+            // we are reading two bytes (used to find places in memory entered as two bytes)
+            if (bytes == 2) {
+                // we read the second code first, because they get flipped around
+                hex = _Memory.memoryArray[this.sectionToIndex(section) + PC + 1];
+                hex += _Memory.memoryArray[this.sectionToIndex(section) + PC];
+            } else {
+                hex = _Memory.memoryArray[this.sectionToIndex(section) + PC];
+            }
+            // We really only will be reading two or one bytes with our op codes, but we could expand this to include more
+            // Also there is no user interaction with this so there is really no chance that there could be another value
+            // for bytes, unless we wanted changed the cpu so this will work for what we want to do
+
             return Utils.hexStringToDecimal(hex);
         }
+
 
         public readMemoryToHex(section: string, PC: number) {
             // return the actually hex string of the next hex pair yet to be run/read
