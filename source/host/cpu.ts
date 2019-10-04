@@ -64,7 +64,7 @@ module TSOS {
                 case "AC": this.loadYregFromMemory();       break;  //load Yreg from memory
                 case "EA":                                  break;  //no operation (we increment PC after the switch statement, so we don't get stuck here)
                 case "00": this.breakProcess();             break;  //break
-                case "EC": this.compareMemToXreg();         break;  //compare byte in memory to Xreg, set Zflag to zero if equal
+                case "EC": this.compareMemToXreg();         break;  //compare byte in memory to Xreg, set Zflag to one if equal
                 case "D0": this.branchBytes();              break;  //branch a given amount of bytes if Zflag is zero
                 case "EE": this.incrementByte();            break;  //increment the value of a byte
                 case "FF": this.systemCall();               break;  //system call (used for printing stuff)
@@ -165,22 +165,52 @@ module TSOS {
         }
 
         public breakProcess() {
-
+            // stops the program from running
+            _CPU.isExecuting = false;
+            // W TODO: Do more here with ending a program
         }
 
         public compareMemToXreg() {
-
+            this.PC++
+            var byteInMemory = _Memory[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)];
+            if (byteInMemory == this.Xreg) {
+                this.Zflag = 1;
+            } else {
+                this.Zflag = 0;
+            }
+            this.PC++;
         }
 
         public branchBytes() {
-
+            this.PC++;
+            // If the Zflag is zero jump a number of bytes forward, if its more than the section of memory, start back at the beginning again
+            if (this.Zflag == 0){
+                var bytes = _MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 1);
+                if (bytes + this.PC > 256) {
+                    this.PC = (this.PC + bytes) % 256;
+                }
+            }
         }
 
         public incrementByte() {
-
+            this.PC++;
+            // increment the value of a byte in memory
+            Utils.incrementHexString(_Memory[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)]);
+            this.PC++;
         }
 
         public systemCall() {
+            // does something specific based on the Xreg
+            if (this.Xreg == 1){
+                // Print out the integer stored in the Yreg
+
+            } else if (this.Xreg == 2) {
+                // Print out the 00 terminated string stored at the address in the Y register
+
+            } else {
+                console.log("System call with Xreg != 1 or 2");
+            }
+
 
         }
 

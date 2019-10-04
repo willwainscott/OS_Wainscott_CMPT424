@@ -18,6 +18,7 @@ var TSOS;
             // For now it looks pretty simple
         };
         // We give this the section of the memory that the program is stored in, the process PC, and the amount of bytes we want to read
+        // It is probably better to make two different functions that read either one or two bytes, will probably change later
         MemoryAccessor.prototype.readMemoryToDecimal = function (section, PC, bytes) {
             // returns a decimal representation of the next hex pair yet to be run/read
             var hex = "";
@@ -36,7 +37,7 @@ var TSOS;
             return TSOS.Utils.hexStringToDecimal(hex);
         };
         MemoryAccessor.prototype.readMemoryToHex = function (section, PC) {
-            // return the actually hex string of the next hex pair yet to be run/read
+            // return the actual hex string of the next hex pair yet to be run/read
             var hex = _Memory.memoryArray[this.sectionToIndex(section) + PC];
             return hex;
         };

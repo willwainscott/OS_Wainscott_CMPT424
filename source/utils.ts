@@ -51,5 +51,10 @@ module TSOS {
         public static hexStringToDecimal(hex: string) {
             return parseInt(hex, 16);
         }
+
+        public static incrementHexString(hex: string){
+            var num = parseInt(hex, 16) + 1;
+            return num.toString(16);
+        }
     }
 }

@@ -505,6 +505,8 @@ module TSOS {
 
                 // Update Memory GUI
 
+                // Update PCB GUI
+
                 // print out response
                 _StdOut.putText("User code loaded successfully");
                 _StdOut.advanceLine();

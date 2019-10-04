@@ -442,6 +442,7 @@ var TSOS;
                 _MemoryManager.loadMemory(userCode, 0); //This accepts the starting index, will probably change to the section (1,2,or 3)
                 // of the memory, once we add the other two sections
                 // Update Memory GUI
+                // Update PCB GUI
                 // print out response
                 _StdOut.putText("User code loaded successfully");
                 _StdOut.advanceLine();

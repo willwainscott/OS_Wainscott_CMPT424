@@ -50,6 +50,10 @@ var TSOS;
         Utils.hexStringToDecimal = function (hex) {
             return parseInt(hex, 16);
         };
+        Utils.incrementHexString = function (hex) {
+            var num = parseInt(hex, 16) + 1;
+            return num.toString(16);
+        };
         return Utils;
     }());
     TSOS.Utils = Utils;

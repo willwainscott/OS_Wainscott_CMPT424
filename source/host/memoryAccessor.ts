@@ -28,6 +28,7 @@ module TSOS {
         }
 
         // We give this the section of the memory that the program is stored in, the process PC, and the amount of bytes we want to read
+        // It is probably better to make two different functions that read either one or two bytes, will probably change later
         public readMemoryToDecimal(section: string, PC: number, bytes: number) {
             // returns a decimal representation of the next hex pair yet to be run/read
             var hex: string = "";
@@ -48,7 +49,7 @@ module TSOS {
 
 
         public readMemoryToHex(section: string, PC: number) {
-            // return the actually hex string of the next hex pair yet to be run/read
+            // return the actual hex string of the next hex pair yet to be run/read
             var hex: string = _Memory.memoryArray[this.sectionToIndex(section) + PC];
             return hex;
         }
