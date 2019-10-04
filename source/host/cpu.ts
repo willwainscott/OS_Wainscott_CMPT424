@@ -16,7 +16,7 @@ module TSOS {
     export class Cpu {
 
         constructor(public PC: number = 0,
-                    public IR: String = "",
+                    public IR: string = "",
                     public ACC: number = 0,
                     public Xreg: number = 0,
                     public Yreg: number = 0,
@@ -78,7 +78,7 @@ module TSOS {
             this.PC++;
 
             // Copy the CPU to the CurrentPCB
-            updatePCBWithCPU();
+            this.updatePCBWithCPU();
 
             //W TODO: Update the GUI again
 
