@@ -27,7 +27,7 @@ var TSOS;
             if (Zflag === void 0) { Zflag = 0; }
             if (state === void 0) { state = "Resident"; }
             if (location === void 0) { location = "Memory"; }
-            if (section === void 0) { section = null; }
+            if (section === void 0) { section = ""; }
             this.PID = PID;
             this.PC = PC;
             this.IR = IR;

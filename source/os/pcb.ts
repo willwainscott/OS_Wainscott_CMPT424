@@ -19,7 +19,7 @@ module TSOS {
                     public Zflag: number      = 0,                //Z Flag
                     public state: string      = "Resident",       //State of the process
                     public location: string   = "Memory",         //Location (in memory/on the disk)
-                    public section: string    = null) {           //The section of memory it is in (or on the hard drive)
+                    public section: string    = "") {             //The section of memory it is in (or on the hard drive)
         }
 
     }

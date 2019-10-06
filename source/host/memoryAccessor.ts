@@ -44,6 +44,8 @@ module TSOS {
             // Also there is no user interaction with this so there is really no chance that there could be another value
             // for bytes, unless we wanted changed the cpu so this will work for what we want to do
 
+            console.log(hex);
+
             return Utils.hexStringToDecimal(hex);
         }
 

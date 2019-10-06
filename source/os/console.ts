@@ -80,7 +80,7 @@ module TSOS {
                                 break;
                             }
                         }
-                    // TODO: make tabing with arguments not go back to just the command
+                    // W TODO: make tabing with arguments not go back to just the command
                     }
                 } else if (chr === String.fromCharCode(38)) {   // up arrow
                     if ((this.historyIndex <= (this.bufferHistory.length - 1))  && // the index is not the last
