@@ -34,7 +34,7 @@ var TSOS;
             // We really only will be reading two or one bytes with our op codes, but we could expand this to include more
             // Also there is no user interaction with this so there is really no chance that there could be another value
             // for bytes, unless we wanted changed the cpu so this will work for what we want to do
-            console.log(hex);
+            //console.log(hex);
             return TSOS.Utils.hexStringToDecimal(hex);
         };
         MemoryAccessor.prototype.readMemoryToHex = function (section, PC) {
