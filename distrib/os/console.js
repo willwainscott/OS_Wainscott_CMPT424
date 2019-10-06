@@ -88,7 +88,7 @@ var TSOS;
                         // W TODO: make tabing with arguments not go back to just the command
                     }
                 }
-                else if (chr === String.fromCharCode(38)) { // up arrow
+                else if (chr === "upArrow") { // up arrow
                     if ((this.historyIndex <= (this.bufferHistory.length - 1)) && // the index is not the last
                         (this.bufferHistory.length > 1) && // there is a history
                         (this.historyIndex != 0)) { // the index is not the first
@@ -103,7 +103,7 @@ var TSOS;
                         this.buffer = this.bufferHistory[this.historyIndex];
                     }
                 }
-                else if (chr === String.fromCharCode(40)) { //down arrow
+                else if (chr === "downArrow") { //down arrow
                     if (this.historyIndex != this.bufferHistory.length - 1) {
                         // if its not the last index ("")
                         //clear the buffer

@@ -58,11 +58,16 @@ var TSOS;
             else if ((keyCode == 32) || // space
                 (keyCode == 13) || // enter
                 (keyCode == 8) || // backspace
-                (keyCode == 9) || // tab
-                // W TODO: move up and down to their own else if statments to fix error
-                (keyCode == 38) || // up arrow
-                (keyCode == 40)) { // down arrow
+                (keyCode == 9)) { // tab
                 chr = String.fromCharCode(keyCode);
+                _KernelInputQueue.enqueue(chr);
+            }
+            else if (keyCode == 38) { // up arrow
+                chr = "upArrow";
+                _KernelInputQueue.enqueue(chr);
+            }
+            else if (keyCode == 40) { // down arrow
+                chr = "downArrow";
                 _KernelInputQueue.enqueue(chr);
             }
             else if ((keyCode >= 48) && (keyCode <= 57)) { //numbers and their shifted characters
