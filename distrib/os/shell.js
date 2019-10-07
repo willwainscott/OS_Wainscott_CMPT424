@@ -64,6 +64,9 @@ var TSOS;
             //load
             sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Loads entered user code.");
             this.commandList[this.commandList.length] = sc;
+            //run
+            sc = new TSOS.ShellCommand(this.shellRun, "run", "<PID> - Runs a process based on a given Process ID.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             // Display the initial prompt.
@@ -132,15 +135,28 @@ var TSOS;
             var retVal = new TSOS.UserCommand();
             // 1. Remove leading and trailing spaces.
             buffer = TSOS.Utils.trim(buffer);
-            // 2. Lower-case it.
-            buffer = buffer.toLowerCase();
-            // 3. Separate on spaces so we can determine the command and command-line args, if any.
+            // 2. check the command after you trim, then make sure you want the args upper or lower
+            var checkList = buffer.split(" ");
+            switch (checkList[0].toLowerCase()) {
+                case "status":
+                    break;
+                case "rot13":
+                    break;
+                case "prompt":
+                    break;
+                default:
+                    buffer = buffer.toLowerCase();
+            }
+            // This wont lower case the command however, something we want, so we fix that in 4.3
+            // 3. Split up the buffer
             var tempList = buffer.split(" ");
             // 4. Take the first (zeroth) element and use that as the command.
             var cmd = tempList.shift(); // Yes, you can do that to an array in JavaScript. See the Queue class.
             // 4.1 Remove any left-over spaces.
             cmd = TSOS.Utils.trim(cmd);
-            // 4.2 Record it in the return value.
+            // 4.3 Lower case it (in the case that it hasn't been)
+            cmd = cmd.toLowerCase();
+            // 4.3 Record it in the return value.
             retVal.command = cmd;
             // 5. Now create the args array from what's left.
             for (var i in tempList) {
@@ -250,7 +266,10 @@ var TSOS;
                         _StdOut.putText("Simulates an OS error and violently dies.");
                         break;
                     case "load":
-                        _StdOut.putText("Loads user code entered into the text area.");
+                        _StdOut.putText("Loads user code entered in the text area into memory.");
+                        break;
+                    case "run":
+                        _StdOut.putText("Runs a loaded program based on the Process ID.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -356,9 +375,11 @@ var TSOS;
         };
         Shell.prototype.shellLoad = function (args) {
             var userCode = _UserCodeTextArea.value;
+            // remove and leading or trailing spaces
+            userCode = TSOS.Utils.trim(userCode);
             var valid = true;
             var charArray = userCode.split(''); //makes array of every char the user entered
-            var stringArray = userCode.split(' '); // makes array of every space seperated string
+            var stringArray = userCode.split(' '); // makes array of every space separated string
             for (var _i = 0, charArray_1 = charArray; _i < charArray_1.length; _i++) {
                 var char = charArray_1[_i];
                 switch (char) { //checks to make sure only hex digits were entered
@@ -379,6 +400,12 @@ var TSOS;
                     case "D": break;
                     case "E": break;
                     case "F": break;
+                    case "a": break;
+                    case "b": break;
+                    case "c": break;
+                    case "d": break;
+                    case "e": break;
+                    case "f": break;
                     default:
                         console.log("invalid hex digits");
                         valid = false;
@@ -389,19 +416,77 @@ var TSOS;
                 if (!valid) { // if its already invalid due to prior loop, break out so we dont loop through
                     break;
                 }
-                else if (hexNumberString.length != 2) {
+                else if (hexNumberString.length != 2) { // valid right now means just of length two
                     console.log("invalid hex commands");
                     valid = false;
                     break;
                 }
             }
             if (valid) {
-                _StdOut.putText("User Code Successfully loaded.");
-                // Do something with the code
+                _StdOut.putText("Entered user code is valid.");
+                _StdOut.advanceLine();
+                // hehehe
+                if (_SarcasticMode) {
+                    _StdOut.putText("Congrats, you're not completely useless.");
+                    _StdOut.advanceLine();
+                }
+                //Make every character in the codes uppercase
+                userCode = userCode.toUpperCase();
+                //load it into memory ...
+                // create a PCB
+                var PCB = new TSOS.PCB();
+                PCB.section = _MemoryManager.assignMemorySection();
+                _PCBList[_PCBList.length] = PCB;
+                // For now we use this because we can only have one program in memory, and
+                // we want it to overwrite the existing program (like you said in class)
+                // and we shouldn't be able to run a program that isn't in memory, so we change its state to Terminated
+                if (_PCBList.length > 1 && _PCBList[PCB.PID - 1].state != "Complete") { // If there is another PCB
+                    _PCBList[_PCBList.length - 2].state = "Terminated";
+                }
+                console.log(_PCBList);
+                //clear memory before loading
+                _MemoryManager.clearMemory(0, 255); //This is just the whole memory array for now, will change once we add more processes
+                //use memory manager to load
+                _MemoryManager.loadMemory(userCode, "1"); //This accepts the starting index, will probably change to the section (1,2,or 3)
+                // of the memory, once we add the other two sections
+                // Update the PCB's IR
+                PCB.IR = _MemoryAccessor.readMemoryToHex(PCB.section, PCB.PC);
+                // Update Memory GUI
+                TSOS.Control.memoryTableUpdate();
+                // Update PCB GUI
+                TSOS.Control.processTableUpdate();
+                // print out response
+                _StdOut.putText("User code loaded successfully");
+                _StdOut.advanceLine();
+                _StdOut.putText("Process ID Number: " + PCB.PID);
             }
             else {
                 _StdOut.putText("Please ensure user code is valid hexadecimal");
             }
+        };
+        Shell.prototype.shellRun = function (args) {
+            // Check to see if the entered PID is valid
+            if (args.length > 0 && !(isNaN(Number(args[0])))) { //Checks to see if the arg is there and is actually a number
+                var enteredPID = Number(args[0]);
+                // Checks to see if the PID exists and hasn't already been run or terminated
+                if (enteredPID < _PCBList.length && _PCBList[enteredPID].state != "Terminated" && _PCBList[enteredPID].state != "Complete") {
+                    //make the entered PCB the current PCB
+                    _CurrentPCB = _PCBList[enteredPID]; // This will eventually be replaced by the scheduler
+                    // change the PCB status to waiting
+                    _PCBList[enteredPID].state = "Waiting"; // For P2 this could be "Running", but later (P3+) it wouldn't make sense
+                    // Make GoNextStep false in case they hit the next step button while there was no process running
+                    _GoNextStep = false;
+                    // make CPU.isExecuting to true
+                    _CPU.isExecuting = true;
+                }
+                else {
+                    _StdOut.putText("Ensure the entered PID number is valid.");
+                }
+            }
+            else {
+                _StdOut.putText("Please enter a PID number.");
+            }
+            //Run the program
         };
         return Shell;
     }());

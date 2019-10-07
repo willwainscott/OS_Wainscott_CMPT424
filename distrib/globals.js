@@ -11,16 +11,23 @@
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
 var APP_NAME = "NASOS"; // Not a Simulation Operating System? Note: I hope changing this doesn't break everything that uses TSOS
-var APP_VERSION = "0.1"; // I assume this will be always updated and completely accurate
+var APP_VERSION = "0.2"; // I assume this will be always updated and completely accurate
 var CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ = 1;
+var SYSTEM_CALL_IRQ = 2;
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
+var _Memory;
+var _MemoryAccessor;
+var _MemoryManager = null;
+var _PCBList = [];
+var _CurrentPCB = null;
+var _ActivePCBList = [];
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Canvas; // Initialized in Control.hostInit().
@@ -46,6 +53,8 @@ var _SarcasticMode = false;
 var _krnKeyboardDriver = null;
 var _hardwareClockID = null;
 var _UserCodeTextArea; // Used to store user code entered into the text area
+var _SingleStep = false; // Based on whether or not the user wants to go step by step
+var _GoNextStep = false; // Is false until the user clicks the step next button, then which it turns true and allows one cycle
 // For testing (and enrichment)...
 var Glados = null; // This is the function Glados() in glados-ip*.js http://alanclasses.github.io/TSOS/test/ .
 var _GLaDOS = null; // If the above is linked in, this is the instantiated instance of Glados.

@@ -31,10 +31,14 @@ module TSOS {
             // Parse the params.  TODO: Check that the params are valid and osTrapError if not.
             var keyCode = params[0];
             var isShifted = params[1];
-            _Kernel.krnTrace("Key code:" + keyCode + " shifted:" + isShifted);
+            var isControlled = params[2];
+            _Kernel.krnTrace("Key code:" + keyCode + " shifted:" + isShifted + " controlled: " + isControlled);
             var chr = "";
             // Check to see if we even want to deal with the key that was pressed.
-            if ((keyCode >= 65) && (keyCode <= 90)) { // letter
+            if (keyCode == 67 && isControlled) {            // Ctrl - C
+                chr = "ctrl-C";
+                _KernelInputQueue.enqueue(chr);
+            } else if ((keyCode >= 65) && (keyCode <= 90)) { // letter
                 if (isShifted === true) { 
                     chr = String.fromCharCode(keyCode); // Uppercase A-Z
                 } else {
@@ -45,10 +49,14 @@ module TSOS {
             } else if ((keyCode == 32)  ||   // space
                        (keyCode == 13)  ||   // enter
                        (keyCode == 8)   ||   // backspace
-                       (keyCode == 9)   ||   // tab
-                       (keyCode == 38)  ||   // up arrow
-                       (keyCode == 40)) {    // down arrow
+                       (keyCode == 9))  {    // tab
                 chr = String.fromCharCode(keyCode);
+                _KernelInputQueue.enqueue(chr);
+            } else if (keyCode == 38) {      // up arrow
+                chr = "upArrow";
+                _KernelInputQueue.enqueue(chr);
+            } else if (keyCode == 40) {      // down arrow
+                chr = "downArrow";
                 _KernelInputQueue.enqueue(chr);
             } else if ((keyCode >= 48) && (keyCode <= 57)) { //numbers and their shifted characters
                 if (isShifted){

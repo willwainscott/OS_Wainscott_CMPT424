@@ -12,7 +12,7 @@
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
 const APP_NAME: string    = "NASOS";   // Not a Simulation Operating System? Note: I hope changing this doesn't break everything that uses TSOS
-const APP_VERSION: string = "0.1";   // I assume this will be always updated and completely accurate
+const APP_VERSION: string = "0.2";   // I assume this will be always updated and completely accurate
 
 const CPU_CLOCK_INTERVAL: number = 100;   // This is in ms (milliseconds) so 1000 = 1 second.
 
@@ -20,12 +20,22 @@ const TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (inte
                               // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 const KEYBOARD_IRQ: number = 1;
 
+const SYSTEM_CALL_IRQ: number = 2;
+
 
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
+var _Memory: TSOS.Memory;
+var _MemoryAccessor: TSOS.MemoryAccessor;
+
+var _MemoryManager: any = null;
+
+var _PCBList: TSOS.PCB[] = [];
+var _CurrentPCB: TSOS.PCB = null;
+var _ActivePCBList: TSOS.PCB[] = [];
 
 var _OSclock: number = 0;  // Page 23.
 
@@ -62,6 +72,10 @@ var _krnKeyboardDriver: TSOS.DeviceDriverKeyboard  = null;
 var _hardwareClockID: number = null;
 
 var _UserCodeTextArea: HTMLTextAreaElement; // Used to store user code entered into the text area
+
+var _SingleStep: boolean = false;       // Based on whether or not the user wants to go step by step
+
+var _GoNextStep: boolean = false;       // Is false until the user clicks the step next button, then which it turns true and allows one cycle
 
 // For testing (and enrichment)...
 var Glados: any = null;  // This is the function Glados() in glados-ip*.js http://alanclasses.github.io/TSOS/test/ .

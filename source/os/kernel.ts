@@ -35,6 +35,9 @@ module TSOS {
             _krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
 
+            // Make a new Memory Manager
+            _MemoryManager = new MemoryManager();
+
             //
             // ... more?
             //
@@ -81,6 +84,13 @@ module TSOS {
                 // TODO (maybe): Implement a priority queue based on the IRQ number/id to enforce interrupt priority.
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
+            } else if (_SingleStep) {
+                if (_CPU.isExecuting && _GoNextStep) {
+                    _CPU.cycle();
+                    _GoNextStep = false;
+                } else {
+                    this.krnTrace("Idle");
+                }
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed.
                 _CPU.cycle();
             } else {                       // If there are no interrupts and there is nothing being executed then just be idle.
@@ -120,6 +130,9 @@ module TSOS {
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();
+                    break;
+                case SYSTEM_CALL_IRQ:                 // User code system call
+                    _StdOut.putText(params[0]);
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

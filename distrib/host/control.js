@@ -71,14 +71,21 @@ var TSOS;
         Control.hostBtnStartOS_click = function (btn) {
             // Disable the (passed-in) start button...
             btn.disabled = true;
-            // .. enable the Halt and Reset buttons ...
+            // .. enable the Halt, Reset, and Single Step buttons ...
             document.getElementById("btnHaltOS").disabled = false;
             document.getElementById("btnReset").disabled = false;
+            document.getElementById("btnSingleStepOn").disabled = false;
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
             _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init(); //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
+            // ... Create some memory because...uh...i forgot why ...
+            _Memory = new TSOS.Memory();
+            _Memory.init();
+            // ... oh yeah cause its part of the hardware ...
+            // ... throw an Accessor in there while you're at it so we can access our new memory ...
+            _MemoryAccessor = new TSOS.MemoryAccessor();
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(TSOS.Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
@@ -104,8 +111,148 @@ var TSOS;
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
         };
+        Control.hostBtnStepOn_click = function (btn) {
+            // change single step to on
+            _SingleStep = true;
+            // disable this button
+            btn.disabled = true;
+            // enable the single step off button
+            document.getElementById("btnSingleStepOFF").disabled = false;
+            // enable the step button
+            document.getElementById("btnStep").disabled = false;
+        };
+        Control.hostBtnStepOff_click = function (btn) {
+            // change single step to off
+            _SingleStep = false;
+            // disable this button
+            btn.disabled = true;
+            // disable the step button
+            document.getElementById("btnStep").disabled = true;
+            // enable the single step on button
+            document.getElementById("btnSingleStepOn").disabled = false;
+        };
+        Control.hostBtnStep_click = function (btn) {
+            // let the cpu do one cycle
+            _GoNextStep = true;
+        };
         Control.hostStatusChange = function (status) {
             document.getElementById("pStatus").innerHTML = "Status: " + status;
+        };
+        // Update Processes table
+        Control.processTableUpdate = function () {
+            this.processTableClear();
+            var processTable = document.getElementById("ProcessTable");
+            for (var i = 0; i < _PCBList.length; i++) {
+                // Insert a row with the appropriate data for each PCB
+                var row = processTable.insertRow(i + 1);
+                // PID Entry
+                var cellPID = row.insertCell(0);
+                cellPID.innerHTML = _PCBList[i].PID.toString();
+                // PC Entry
+                var cellPC = row.insertCell(1);
+                cellPC.innerHTML = _PCBList[i].PC.toString();
+                // IR Entry
+                var cellIR = row.insertCell(2);
+                cellIR.innerHTML = _PCBList[i].IR;
+                // ACC Entry
+                var cellACC = row.insertCell(3);
+                cellACC.innerHTML = _PCBList[i].ACC.toString();
+                // Xreg Entry
+                var cellXreg = row.insertCell(4);
+                cellXreg.innerHTML = _PCBList[i].Xreg.toString();
+                // Yreg Entry
+                var cellYreg = row.insertCell(5);
+                cellYreg.innerHTML = _PCBList[i].Yreg.toString();
+                // Zflag Entry
+                var cellZflag = row.insertCell(6);
+                cellZflag.innerHTML = _PCBList[i].Zflag.toString();
+                // State Entry
+                var cellState = row.insertCell(7);
+                cellState.innerHTML = _PCBList[i].state;
+                // Location Entry
+                var cellLocation = row.insertCell(8);
+                cellLocation.innerHTML = _PCBList[i].location;
+            }
+        };
+        // Clear Process Table
+        Control.processTableClear = function () {
+            var processTable = document.getElementById("ProcessTable");
+            // delete each row
+            for (var i = processTable.rows.length; i > 1; i--) {
+                processTable.deleteRow(i - 1);
+            }
+        };
+        // Update CPU table
+        Control.CPUTableUpdate = function () {
+            if (_CPU.isExecuting) { // Only update the CPU if it is executing
+                // PC Entry
+                var cpuPC = document.getElementById("cpuPC");
+                cpuPC.innerHTML = _CPU.PC.toString();
+                // IR Entry
+                var cpuIR = document.getElementById("cpuIR");
+                cpuIR.innerHTML = _CPU.IR;
+                // Acc Entry
+                var cpuACC = document.getElementById("cpuACC");
+                cpuACC.innerHTML = _CPU.ACC.toString();
+                // X Entry
+                var cpuX = document.getElementById("cpuX");
+                cpuX.innerHTML = _CPU.Xreg.toString();
+                // Y Entry
+                var cpuY = document.getElementById("cpuY");
+                cpuY.innerHTML = _CPU.Yreg.toString();
+                // Z Entry
+                var cpuZ = document.getElementById("cpuZ");
+                cpuZ.innerHTML = _CPU.Zflag.toString();
+            }
+            else {
+                this.CPUTableClear();
+            }
+        };
+        Control.CPUTableClear = function () {
+            // PC Entry
+            var cpuPC = document.getElementById("cpuPC");
+            cpuPC.innerHTML = "-";
+            // IR Entry
+            var cpuIR = document.getElementById("cpuIR");
+            cpuIR.innerHTML = "-";
+            // Acc Entry
+            var cpuACC = document.getElementById("cpuACC");
+            cpuACC.innerHTML = "-";
+            // X Entry
+            var cpuX = document.getElementById("cpuX");
+            cpuX.innerHTML = "-";
+            // Y Entry
+            var cpuY = document.getElementById("cpuY");
+            cpuY.innerHTML = "-";
+            // Z Entry
+            var cpuZ = document.getElementById("cpuZ");
+            cpuZ.innerHTML = "-";
+        };
+        // Update Memory Table
+        Control.memoryTableUpdate = function () {
+            this.memoryTableClear();
+            // each cell in table has an id based on the memory index
+            for (var i = 0; i < _Memory.memoryArray.length; i++) {
+                var entry = document.getElementById("memory" + i);
+                entry.innerHTML = _Memory.memoryArray[i];
+            }
+        };
+        // Clear Memory Table
+        Control.memoryTableClear = function () {
+            // set everything to 00
+            for (var i = 0; i < _Memory.memoryArray.length; i++) {
+                var entry = document.getElementById("memory" + i);
+                entry.innerHTML = "00";
+            }
+        };
+        // Updates all GUI Tables
+        Control.updateAllTables = function () {
+            this.processTableClear();
+            this.memoryTableClear();
+            this.CPUTableClear();
+            this.processTableUpdate();
+            this.memoryTableUpdate();
+            this.CPUTableUpdate();
         };
         return Control;
     }());

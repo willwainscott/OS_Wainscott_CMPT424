@@ -55,6 +55,18 @@ var TSOS;
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
+                else if (chr === "ctrl-C") {
+                    if (_CPU.isExecuting) {
+                        _CPU.isExecuting = false;
+                        _CurrentPCB.state = "Terminated";
+                        _PCBList[_CurrentPCB.PID] = _CurrentPCB;
+                        TSOS.Control.updateAllTables();
+                        this.advanceLine();
+                        this.putText("Process " + _CurrentPCB.PID + " Terminated with Ctrl-C.");
+                        this.advanceLine();
+                        _OsShell.putPrompt();
+                    }
+                }
                 else if (chr === String.fromCharCode(8)) { // backspace
                     if (this.buffer.length > 0) { //if there is something in the buffer
                         //get the last character typed and erase it from the canvas
@@ -85,10 +97,10 @@ var TSOS;
                                 break;
                             }
                         }
-                        // TODO: make tabing with arguments not go back to just the command
+                        // W TODO: make tabing with arguments not go back to just the command
                     }
                 }
-                else if (chr === String.fromCharCode(38)) { // up arrow
+                else if (chr === "upArrow") { // up arrow
                     if ((this.historyIndex <= (this.bufferHistory.length - 1)) && // the index is not the last
                         (this.bufferHistory.length > 1) && // there is a history
                         (this.historyIndex != 0)) { // the index is not the first
@@ -103,7 +115,7 @@ var TSOS;
                         this.buffer = this.bufferHistory[this.historyIndex];
                     }
                 }
-                else if (chr === String.fromCharCode(40)) { //down arrow
+                else if (chr === "downArrow") { //down arrow
                     if (this.historyIndex != this.bufferHistory.length - 1) {
                         // if its not the last index ("")
                         //clear the buffer
