@@ -73,6 +73,10 @@ var _hardwareClockID: number = null;
 
 var _UserCodeTextArea: HTMLTextAreaElement; // Used to store user code entered into the text area
 
+var _SingleStep: boolean = false;       // Based on whether or not the user wants to go step by step
+
+var _GoNextStep: boolean = false;       // Is false until the user clicks the step next button, then which it turns true and allows one cycle
+
 // For testing (and enrichment)...
 var Glados: any = null;  // This is the function Glados() in glados-ip*.js http://alanclasses.github.io/TSOS/test/ .
 var _GLaDOS: any = null; // If the above is linked in, this is the instantiated instance of Glados.

@@ -474,6 +474,8 @@ var TSOS;
                     _CurrentPCB = _PCBList[enteredPID]; // This will eventually be replaced by the scheduler
                     // change the PCB status to waiting
                     _PCBList[enteredPID].state = "Waiting"; // For P2 this could be "Running", but later (P3+) it wouldn't make sense
+                    // Make GoNextStep false in case they hit the next step button while there was no process running
+                    _GoNextStep = false;
                     // make CPU.isExecuting to true
                     _CPU.isExecuting = true;
                 }

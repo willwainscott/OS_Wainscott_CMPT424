@@ -71,9 +71,10 @@ var TSOS;
         Control.hostBtnStartOS_click = function (btn) {
             // Disable the (passed-in) start button...
             btn.disabled = true;
-            // .. enable the Halt and Reset buttons ...
+            // .. enable the Halt, Reset, and Single Step buttons ...
             document.getElementById("btnHaltOS").disabled = false;
             document.getElementById("btnReset").disabled = false;
+            document.getElementById("btnSingleStepOn").disabled = false;
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
@@ -109,6 +110,30 @@ var TSOS;
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
+        };
+        Control.hostBtnStepOn_click = function (btn) {
+            // change single step to on
+            _SingleStep = true;
+            // disable this button
+            btn.disabled = true;
+            // enable the single step off button
+            document.getElementById("btnSingleStepOFF").disabled = false;
+            // enable the step button
+            document.getElementById("btnStep").disabled = false;
+        };
+        Control.hostBtnStepOff_click = function (btn) {
+            // change single step to off
+            _SingleStep = false;
+            // disable this button
+            btn.disabled = true;
+            // disable the step button
+            document.getElementById("btnStep").disabled = true;
+            // enable the single step on button
+            document.getElementById("btnSingleStepOn").disabled = false;
+        };
+        Control.hostBtnStep_click = function (btn) {
+            // let the cpu do one cycle
+            _GoNextStep = true;
         };
         Control.hostStatusChange = function (status) {
             document.getElementById("pStatus").innerHTML = "Status: " + status;

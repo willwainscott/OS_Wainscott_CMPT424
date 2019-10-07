@@ -53,6 +53,8 @@ var _SarcasticMode = false;
 var _krnKeyboardDriver = null;
 var _hardwareClockID = null;
 var _UserCodeTextArea; // Used to store user code entered into the text area
+var _SingleStep = false; // Based on whether or not the user wants to go step by step
+var _GoNextStep = false; // Is false until the user clicks the step next button, then which it turns true and allows one cycle
 // For testing (and enrichment)...
 var Glados = null; // This is the function Glados() in glados-ip*.js http://alanclasses.github.io/TSOS/test/ .
 var _GLaDOS = null; // If the above is linked in, this is the instantiated instance of Glados.
