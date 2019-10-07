@@ -1,0 +1,16 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{OSLab4 Questions}
+\author{Will Wainscott}
+\date{October 2019}
+
+\begin{document}
+
+\maketitle
+
+\section{What is the relationship between a guest operation system and a host operating system in a system like VMware? What factors need to be considered in choosing the host operating system?}
+
+In a system like VMware, the host operating system is the actual operating system that runs on the physical hardware. This would be your normal operating system if you were only using one. A guest operating system is one that seems like normal host operating system, but actually runs in an application. Different parts of the OS such as harware and processes are simulated and interacted with by the user. The application then translates it to the host operating system and does the actual processes. This sounds familiar to something we've talked about, maybe worked on, ... but it seems to have escaped my mind. When choosing the host OS for this relationship you have to be sure that is has the capability to run other OS's in an application. It has to be fast enough to do multiple things at one time to seem like a seamless use of resources. Any problems with the host OS will affect the guest OS, so the host OS must be very reliable. 
+
+\end{document}
