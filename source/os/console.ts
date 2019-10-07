@@ -52,6 +52,17 @@ module TSOS {
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
                     this.buffer = "";
+                } else if (chr === "ctrl-C") {
+                    if (_CPU.isExecuting) {
+                        _CPU.isExecuting = false;
+                        _CurrentPCB.state = "Terminated";
+                        _PCBList[_CurrentPCB.PID] = _CurrentPCB;
+                        Control.updateAllTables();
+                        this.advanceLine();
+                        this.putText("Process " + _CurrentPCB.PID + " Terminated with Ctrl-C.");
+                        this.advanceLine();
+                        _OsShell.putPrompt();
+                    }
                 } else if (chr === String.fromCharCode(8)) { // backspace
                     if (this.buffer.length > 0) { //if there is something in the buffer
                         //get the last character typed and erase it from the canvas
