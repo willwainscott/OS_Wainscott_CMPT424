@@ -46,7 +46,7 @@ var TSOS;
             _CurrentPCB.state = "Running";
             // Get the currentPCB and assign its values to corresponding cpu values
             this.updateCPUWithPCB();
-            // W TODO: Update the GUI
+            // Update the GUI
             TSOS.Control.processTableUpdate();
             TSOS.Control.CPUTableUpdate();
             // Run the next code
@@ -104,7 +104,7 @@ var TSOS;
             this.updatePCBWithCPU();
             // Copy Current PCB to the _PCBList
             this.updatePCBList();
-            //W TODO: Update the GUI again
+            // Update the GUI again
             TSOS.Control.updateAllTables();
         };
         Cpu.prototype.updateCPUWithPCB = function () {
@@ -180,7 +180,12 @@ var TSOS;
         Cpu.prototype.breakProcess = function () {
             // stops the program from running
             _CPU.isExecuting = false;
-            _CurrentPCB.state = "Terminated";
+            _CurrentPCB.state = "Complete";
+            // I don't know if  I shouldn't be doing this OS stuff in the cpu. May need to change for better host/OS separation
+            _StdOut.advanceLine();
+            _StdOut.putText("Process " + _CurrentPCB.PID + " Complete!");
+            _StdOut.advanceLine();
+            _OsShell.putPrompt();
         };
         Cpu.prototype.compareMemToXreg = function () {
             this.PC++;

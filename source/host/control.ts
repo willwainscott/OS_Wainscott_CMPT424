@@ -186,12 +186,49 @@ module TSOS {
 
         // Update CPU table
         public static CPUTableUpdate() {
-
-
+            if (_CPU.isExecuting) {         // Only update the CPU if it is executing
+                // PC Entry
+                var cpuPC = document.getElementById("cpuPC");
+                cpuPC.innerHTML = _CPU.PC.toString();
+                // IR Entry
+                var cpuIR = document.getElementById("cpuIR");
+                cpuIR.innerHTML = _CPU.IR;
+                // Acc Entry
+                var cpuACC = document.getElementById("cpuACC");
+                cpuACC.innerHTML = _CPU.ACC.toString();
+                // X Entry
+                var cpuX = document.getElementById("cpuX");
+                cpuX.innerHTML = _CPU.Xreg.toString();
+                // Y Entry
+                var cpuY = document.getElementById("cpuY");
+                cpuY.innerHTML = _CPU.Yreg.toString();
+                // Z Entry
+                var cpuZ = document.getElementById("cpuZ");
+                cpuZ.innerHTML = _CPU.Zflag.toString();
+            } else {
+                this.CPUTableClear();
+            }
         }
 
         public static CPUTableClear() {
-
+            // PC Entry
+            var cpuPC = document.getElementById("cpuPC");
+            cpuPC.innerHTML = "-";
+            // IR Entry
+            var cpuIR = document.getElementById("cpuIR");
+            cpuIR.innerHTML = "-";
+            // Acc Entry
+            var cpuACC = document.getElementById("cpuACC");
+            cpuACC.innerHTML = "-";
+            // X Entry
+            var cpuX = document.getElementById("cpuX");
+            cpuX.innerHTML = "-";
+            // Y Entry
+            var cpuY = document.getElementById("cpuY");
+            cpuY.innerHTML = "-";
+            // Z Entry
+            var cpuZ = document.getElementById("cpuZ");
+            cpuZ.innerHTML = "-";
         }
 
         // Update Memory Table
@@ -221,7 +258,7 @@ module TSOS {
 
             this.processTableUpdate();
             this.memoryTableUpdate();
-            this.CPUTableClear();
+            this.CPUTableUpdate();
         }
     }
 }

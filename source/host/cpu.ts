@@ -46,7 +46,7 @@ module TSOS {
             // Get the currentPCB and assign its values to corresponding cpu values
             this.updateCPUWithPCB();
 
-            // W TODO: Update the GUI
+            // Update the GUI
             Control.processTableUpdate();
             Control.CPUTableUpdate();
 
@@ -86,7 +86,7 @@ module TSOS {
             // Copy Current PCB to the _PCBList
             this.updatePCBList();
 
-            //W TODO: Update the GUI again
+            // Update the GUI again
             Control.updateAllTables();
 
         }
@@ -177,7 +177,12 @@ module TSOS {
         public breakProcess() {
             // stops the program from running
             _CPU.isExecuting = false;
-            _CurrentPCB.state = "Terminated";
+            _CurrentPCB.state = "Complete";
+            // I don't know if  I shouldn't be doing this OS stuff in the cpu. May need to change for better host/OS separation
+            _StdOut.advanceLine();
+            _StdOut.putText("Process " + _CurrentPCB.PID + " Complete!");
+            _StdOut.advanceLine();
+            _OsShell.putPrompt();
         }
 
         public compareMemToXreg() {
