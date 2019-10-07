@@ -42,13 +42,13 @@ module TSOS {
 
             //Change the PCB to state Running
             _CurrentPCB.state = "Running";
-            // Change the current running OP code
-            _CurrentPCB.IR = _MemoryAccessor.readMemoryToHex(_CurrentPCB.section, _CurrentPCB.PC);
 
             // Get the currentPCB and assign its values to corresponding cpu values
             this.updateCPUWithPCB();
 
             // W TODO: Update the GUI
+            Control.processTableUpdate();
+            Control.CPUTableUpdate();
 
 
             // Run the next code
@@ -77,10 +77,17 @@ module TSOS {
             // Increment the PC so we know to go on the next command the next cpu cycle for this process
             this.PC++;
 
+            // Update the IR
+            this.IR = _MemoryAccessor.readMemoryToHex(_CurrentPCB.section, this.PC);
+
             // Copy the CPU to the CurrentPCB
             this.updatePCBWithCPU();
 
+            // Copy Current PCB to the _PCBList
+            this.updatePCBList();
+
             //W TODO: Update the GUI again
+            Control.updateAllTables();
 
         }
 
@@ -101,6 +108,9 @@ module TSOS {
             _CurrentPCB.Yreg = this.Yreg;
             _CurrentPCB.Zflag = this.Zflag;
 
+        }
+        public updatePCBList() {
+            _PCBList[_CurrentPCB.PID] = _CurrentPCB;
         }
 
         //Op code functionality
@@ -167,7 +177,7 @@ module TSOS {
         public breakProcess() {
             // stops the program from running
             _CPU.isExecuting = false;
-            // W TODO: Do more here with ending a program
+            _CurrentPCB.state = "Terminated";
         }
 
         public compareMemToXreg() {

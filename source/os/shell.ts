@@ -499,10 +499,14 @@ module TSOS {
                 //use memory manager to load
                 _MemoryManager.loadMemory(userCode,"1"); //This accepts the starting index, will probably change to the section (1,2,or 3)
                                                        // of the memory, once we add the other two sections
+                // Update the PCB's IR
+                PCB.IR = _MemoryAccessor.readMemoryToHex(PCB.section, PCB.PC);
 
                 // Update Memory GUI
+                Control.memoryTableUpdate();
 
                 // Update PCB GUI
+                Control.processTableUpdate();
 
                 // print out response
                 _StdOut.putText("User code loaded successfully");

@@ -44,11 +44,11 @@ var TSOS;
             // Do the real work here. Be sure to set this.isExecuting appropriately.
             //Change the PCB to state Running
             _CurrentPCB.state = "Running";
-            // Change the current running OP code
-            _CurrentPCB.IR = _MemoryAccessor.readMemoryToHex(_CurrentPCB.section, _CurrentPCB.PC);
             // Get the currentPCB and assign its values to corresponding cpu values
             this.updateCPUWithPCB();
             // W TODO: Update the GUI
+            TSOS.Control.processTableUpdate();
+            TSOS.Control.CPUTableUpdate();
             // Run the next code
             switch (_CurrentPCB.IR) {
                 case "A9":
@@ -98,9 +98,14 @@ var TSOS;
             }
             // Increment the PC so we know to go on the next command the next cpu cycle for this process
             this.PC++;
+            // Update the IR
+            this.IR = _MemoryAccessor.readMemoryToHex(_CurrentPCB.section, this.PC);
             // Copy the CPU to the CurrentPCB
             this.updatePCBWithCPU();
+            // Copy Current PCB to the _PCBList
+            this.updatePCBList();
             //W TODO: Update the GUI again
+            TSOS.Control.updateAllTables();
         };
         Cpu.prototype.updateCPUWithPCB = function () {
             this.PC = _CurrentPCB.PC;
@@ -117,6 +122,9 @@ var TSOS;
             _CurrentPCB.Xreg = this.Xreg;
             _CurrentPCB.Yreg = this.Yreg;
             _CurrentPCB.Zflag = this.Zflag;
+        };
+        Cpu.prototype.updatePCBList = function () {
+            _PCBList[_CurrentPCB.PID] = _CurrentPCB;
         };
         //Op code functionality
         Cpu.prototype.loadAccConstant = function () {
@@ -172,7 +180,7 @@ var TSOS;
         Cpu.prototype.breakProcess = function () {
             // stops the program from running
             _CPU.isExecuting = false;
-            // W TODO: Do more here with ending a program
+            _CurrentPCB.state = "Terminated";
         };
         Cpu.prototype.compareMemToXreg = function () {
             this.PC++;

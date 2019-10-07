@@ -139,10 +139,89 @@ module TSOS {
         }
 
         // Update Processes table
+        public static processTableUpdate() {
+            this.processTableClear();
+            var processTable = <HTMLTableElement>document.getElementById("ProcessTable");
+            for (var i = 0; i < _PCBList.length; i++) {
+                // Insert a row with the appropriate data for each PCB
+                var row = processTable.insertRow(i + 1);
+                // PID Entry
+                var cellPID = row.insertCell(0);
+                cellPID.innerHTML = _PCBList[i].PID.toString();
+                // PC Entry
+                var cellPC = row.insertCell(1);
+                cellPC.innerHTML = _PCBList[i].PC.toString();
+                // IR Entry
+                var cellIR = row.insertCell(2);
+                cellIR.innerHTML = _PCBList[i].IR;
+                // ACC Entry
+                var cellACC = row.insertCell(3);
+                cellACC.innerHTML = _PCBList[i].ACC.toString();
+                // Xreg Entry
+                var cellXreg = row.insertCell(4);
+                cellXreg.innerHTML = _PCBList[i].Xreg.toString();
+                // Yreg Entry
+                var cellYreg = row.insertCell(5);
+                cellYreg.innerHTML = _PCBList[i].Yreg.toString();
+                // Zflag Entry
+                var cellZflag = row.insertCell(6);
+                cellZflag.innerHTML = _PCBList[i].Zflag.toString();
+                // State Entry
+                var cellState = row.insertCell(7);
+                cellState.innerHTML = _PCBList[i].state;
+                // Location Entry
+                var cellLocation = row.insertCell(8);
+                cellLocation.innerHTML = _PCBList[i].location;
+            }
+        }
+
+        // Clear Process Table
+        public static processTableClear() {
+            var processTable = <HTMLTableElement>document.getElementById("ProcessTable");
+                // delete each row
+                for (var i = processTable.rows.length; i > 1; i--){
+                    processTable.deleteRow(i-1);
+                }
+        }
 
         // Update CPU table
+        public static CPUTableUpdate() {
+
+
+        }
+
+        public static CPUTableClear() {
+
+        }
 
         // Update Memory Table
+        public static memoryTableUpdate() {
+            this.memoryTableClear();
+            // each cell in table has an id based on the memory index
+            for (var i = 0; i < _Memory.memoryArray.length; i++) {
+                var entry = document.getElementById("memory" + i);
+                entry.innerHTML = _Memory.memoryArray[i];
+            }
+        }
 
+        // Clear Memory Table
+        public static memoryTableClear() {
+            // set everything to 00
+            for (var i = 0; i < _Memory.memoryArray.length; i++) {
+                var entry = document.getElementById("memory" + i);
+                entry.innerHTML = "00";
+            }
+        }
+
+        // Updates all GUI Tables
+        public static updateAllTables() {
+            this.processTableClear();
+            this.memoryTableClear();
+            this.CPUTableClear();
+
+            this.processTableUpdate();
+            this.memoryTableUpdate();
+            this.CPUTableClear();
+        }
     }
 }
