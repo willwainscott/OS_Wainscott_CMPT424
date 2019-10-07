@@ -187,19 +187,31 @@ module TSOS {
             // 1. Remove leading and trailing spaces.
             buffer = Utils.trim(buffer);
 
-            // W TODO: check the command after you trim, then make sure you want the args upper or lower
+            // 2. check the command after you trim, then make sure you want the args upper or lower
+            var checkList = buffer.split(" ");
 
-            // 2. Lower-case it.
-            buffer = buffer.toLowerCase();
+            switch (checkList[0].toLowerCase()) {
+                case "status":
+                    break;
+                case "rot13":
+                    break;
+                case "prompt":
+                    break;
+                default:
+                    buffer = buffer.toLowerCase();
+            }
+            // This wont lower case the command however, something we want, so we fix that in 4.3
 
-            // 3. Separate on spaces so we can determine the command and command-line args, if any.
+            // 3. Split up the buffer
             var tempList = buffer.split(" ");
 
             // 4. Take the first (zeroth) element and use that as the command.
             var cmd = tempList.shift();  // Yes, you can do that to an array in JavaScript. See the Queue class.
             // 4.1 Remove any left-over spaces.
             cmd = Utils.trim(cmd);
-            // 4.2 Record it in the return value.
+            // 4.3 Lower case it (in the case that it hasn't been)
+            cmd = cmd.toLowerCase();
+            // 4.3 Record it in the return value.
             retVal.command = cmd;
 
             // 5. Now create the args array from what's left.
