@@ -130,50 +130,50 @@ var TSOS;
         Cpu.prototype.loadAccConstant = function () {
             this.PC++;
             // Load accumulator with the decimal equivalent of a hex byte
-            this.ACC = _MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 1);
+            this.ACC = _MemoryAccessor.readOneMemoryByteToDecimal(_CurrentPCB.section, this.PC);
         };
         Cpu.prototype.loadAccMemory = function () {
             this.PC++;
             // loads accumulator with a value that is stored in memory, with the two byte hex memory given by the next two bytes
-            this.ACC = TSOS.Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)]);
+            this.ACC = TSOS.Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readTwoMemoryBytesToDecimal(_CurrentPCB.section, this.PC)]);
             // We increment again because we are reading two bytes for the memory address
             this.PC++;
         };
         Cpu.prototype.storeAcc = function () {
             this.PC++;
             // stores the accumulator in a specific memory index, given by the next two bytes
-            _Memory.memoryArray[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)] = TSOS.Utils.decimalToHexString(this.ACC);
+            _Memory.memoryArray[_MemoryAccessor.readTwoMemoryBytesToDecimal(_CurrentPCB.section, this.PC)] = TSOS.Utils.decimalToHexString(this.ACC);
             // We increment again because we are reading two bytes for the memory address
             this.PC++;
         };
         Cpu.prototype.addWithCarry = function () {
             this.PC++;
             // We are adding a value stored at a certain place in the memory to the accumulator's value, and storing the result in the accumulator
-            this.ACC += TSOS.Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)]);
+            this.ACC += TSOS.Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readTwoMemoryBytesToDecimal(_CurrentPCB.section, this.PC)]);
             // Increment again because we are reading two bytes for the memory address
             this.PC++;
         };
         Cpu.prototype.loadXregFromConstant = function () {
             this.PC++;
             // Load accumulator with the decimal equivalent of a hex byte
-            this.Xreg = _MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 1);
+            this.Xreg = _MemoryAccessor.readOneMemoryByteToDecimal(_CurrentPCB.section, this.PC);
         };
         Cpu.prototype.loadXregFromMemory = function () {
             this.PC++;
             // loads accumulator with a value that is stored in memory, with the two byte hex memory given by the next two bytes
-            this.Xreg = TSOS.Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)]);
+            this.Xreg = TSOS.Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readTwoMemoryBytesToDecimal(_CurrentPCB.section, this.PC)]);
             // We increment again because we are reading two bytes for the memory address
             this.PC++;
         };
         Cpu.prototype.loadYregFromConstant = function () {
             this.PC++;
             // Load accumulator with the decimal equivalent of a hex byte
-            this.Yreg = _MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 1);
+            this.Yreg = _MemoryAccessor.readOneMemoryByteToDecimal(_CurrentPCB.section, this.PC);
         };
         Cpu.prototype.loadYregFromMemory = function () {
             this.PC++;
             // loads accumulator with a value that is stored in memory, with the two byte hex memory given by the next two bytes
-            this.Yreg = TSOS.Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)]);
+            this.Yreg = TSOS.Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readTwoMemoryBytesToDecimal(_CurrentPCB.section, this.PC)]);
             // We increment again because we are reading two bytes for the memory address
             this.PC++;
         };
@@ -189,7 +189,7 @@ var TSOS;
         };
         Cpu.prototype.compareMemToXreg = function () {
             this.PC++;
-            var byteInMemory = TSOS.Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)]);
+            var byteInMemory = TSOS.Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readTwoMemoryBytesToDecimal(_CurrentPCB.section, this.PC)]);
             if (byteInMemory == this.Xreg) {
                 this.Zflag = 1;
             }
@@ -202,7 +202,7 @@ var TSOS;
             this.PC++;
             // If the Zflag is zero jump a number of bytes forward, if its more than the section of memory, start back at the beginning again
             if (this.Zflag == 0) {
-                var bytes = _MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 1);
+                var bytes = _MemoryAccessor.readOneMemoryByteToDecimal(_CurrentPCB.section, this.PC);
                 if (bytes + this.PC > 256) {
                     this.PC = (this.PC + bytes) % 256;
                 }
@@ -214,8 +214,8 @@ var TSOS;
         Cpu.prototype.incrementByte = function () {
             this.PC++;
             // increment the value of a byte in memory
-            _Memory.memoryArray[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)] =
-                TSOS.Utils.incrementHexString(_Memory.memoryArray[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)]);
+            _Memory.memoryArray[_MemoryAccessor.readTwoMemoryBytesToDecimal(_CurrentPCB.section, this.PC)] =
+                TSOS.Utils.incrementHexString(_Memory.memoryArray[_MemoryAccessor.readTwoMemoryBytesToDecimal(_CurrentPCB.section, this.PC)]);
             this.PC++;
         };
         Cpu.prototype.systemCall = function () {

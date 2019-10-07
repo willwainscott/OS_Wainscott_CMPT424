@@ -175,25 +175,25 @@ module TSOS {
                 var row = processTable.insertRow(i + 1);
                 // PID Entry
                 var cellPID = row.insertCell(0);
-                cellPID.innerHTML = _PCBList[i].PID.toString();
+                cellPID.innerHTML = _PCBList[i].PID.toString(16).toUpperCase();
                 // PC Entry
                 var cellPC = row.insertCell(1);
-                cellPC.innerHTML = _PCBList[i].PC.toString();
+                cellPC.innerHTML = _PCBList[i].PC.toString(16).toUpperCase();
                 // IR Entry
                 var cellIR = row.insertCell(2);
                 cellIR.innerHTML = _PCBList[i].IR;
                 // ACC Entry
                 var cellACC = row.insertCell(3);
-                cellACC.innerHTML = _PCBList[i].ACC.toString();
+                cellACC.innerHTML = _PCBList[i].ACC.toString(16).toUpperCase();
                 // Xreg Entry
                 var cellXreg = row.insertCell(4);
-                cellXreg.innerHTML = _PCBList[i].Xreg.toString();
+                cellXreg.innerHTML = _PCBList[i].Xreg.toString(16).toUpperCase();
                 // Yreg Entry
                 var cellYreg = row.insertCell(5);
-                cellYreg.innerHTML = _PCBList[i].Yreg.toString();
+                cellYreg.innerHTML = _PCBList[i].Yreg.toString(16).toUpperCase();
                 // Zflag Entry
                 var cellZflag = row.insertCell(6);
-                cellZflag.innerHTML = _PCBList[i].Zflag.toString();
+                cellZflag.innerHTML = _PCBList[i].Zflag.toString(16).toUpperCase();
                 // State Entry
                 var cellState = row.insertCell(7);
                 cellState.innerHTML = _PCBList[i].state;
@@ -217,22 +217,22 @@ module TSOS {
             if (_CPU.isExecuting) {         // Only update the CPU if it is executing
                 // PC Entry
                 var cpuPC = document.getElementById("cpuPC");
-                cpuPC.innerHTML = _CPU.PC.toString();
+                cpuPC.innerHTML = _CPU.PC.toString(16).toUpperCase();
                 // IR Entry
                 var cpuIR = document.getElementById("cpuIR");
                 cpuIR.innerHTML = _CPU.IR;
                 // Acc Entry
                 var cpuACC = document.getElementById("cpuACC");
-                cpuACC.innerHTML = _CPU.ACC.toString();
+                cpuACC.innerHTML = _CPU.ACC.toString(16).toUpperCase();
                 // X Entry
                 var cpuX = document.getElementById("cpuX");
-                cpuX.innerHTML = _CPU.Xreg.toString();
+                cpuX.innerHTML = _CPU.Xreg.toString(16).toUpperCase();
                 // Y Entry
                 var cpuY = document.getElementById("cpuY");
-                cpuY.innerHTML = _CPU.Yreg.toString();
+                cpuY.innerHTML = _CPU.Yreg.toString(16).toUpperCase();
                 // Z Entry
                 var cpuZ = document.getElementById("cpuZ");
-                cpuZ.innerHTML = _CPU.Zflag.toString();
+                cpuZ.innerHTML = _CPU.Zflag.toString(16).toUpperCase();
             } else {
                 this.CPUTableClear();
             }

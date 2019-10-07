@@ -17,24 +17,19 @@ var TSOS;
             // This will be much more useful when there is more than one section in memory
             // For now it looks pretty simple
         };
-        // We give this the section of the memory that the program is stored in, the process PC, and the amount of bytes we want to read
-        // It is probably better to make two different functions that read either one or two bytes, will probably change later
-        MemoryAccessor.prototype.readMemoryToDecimal = function (section, PC, bytes) {
+        MemoryAccessor.prototype.readOneMemoryByteToDecimal = function (section, PC) {
             // returns a decimal representation of the next hex pair yet to be run/read
             var hex = "";
-            // we are reading two bytes (used to find places in memory entered as two bytes)
-            if (bytes == 2) {
-                // we read the second code first, because they get flipped around
-                hex = _Memory.memoryArray[this.sectionToIndex(section) + PC + 1];
-                hex += _Memory.memoryArray[this.sectionToIndex(section) + PC];
-            }
-            else {
-                hex = _Memory.memoryArray[this.sectionToIndex(section) + PC];
-            }
-            // We really only will be reading two or one bytes with our op codes, but we could expand this to include more
-            // Also there is no user interaction with this so there is really no chance that there could be another value
-            // for bytes, unless we wanted changed the cpu so this will work for what we want to do
-            //console.log(hex);
+            // Reads the next byte in memory
+            hex = _Memory.memoryArray[this.sectionToIndex(section) + PC];
+            return TSOS.Utils.hexStringToDecimal(hex);
+        };
+        MemoryAccessor.prototype.readTwoMemoryBytesToDecimal = function (section, PC) {
+            // returns a decimal representation of two hex bytes
+            var hex = "";
+            // we read the two bytes by reading the second code first
+            hex = _Memory.memoryArray[this.sectionToIndex(section) + PC + 1];
+            hex += _Memory.memoryArray[this.sectionToIndex(section) + PC];
             return TSOS.Utils.hexStringToDecimal(hex);
         };
         MemoryAccessor.prototype.readMemoryToHex = function (section, PC) {

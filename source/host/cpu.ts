@@ -118,13 +118,13 @@ module TSOS {
         public loadAccConstant() {
             this.PC++;
             // Load accumulator with the decimal equivalent of a hex byte
-            this.ACC = _MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 1);
+            this.ACC = _MemoryAccessor.readOneMemoryByteToDecimal(_CurrentPCB.section, this.PC);
         }
 
         public loadAccMemory() {
             this.PC++;
             // loads accumulator with a value that is stored in memory, with the two byte hex memory given by the next two bytes
-            this.ACC = Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)]);
+            this.ACC = Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readTwoMemoryBytesToDecimal(_CurrentPCB.section, this.PC)]);
             // We increment again because we are reading two bytes for the memory address
             this.PC++;
         }
@@ -132,7 +132,7 @@ module TSOS {
         public storeAcc() {
             this.PC++;
             // stores the accumulator in a specific memory index, given by the next two bytes
-            _Memory.memoryArray[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)] = Utils.decimalToHexString(this.ACC);
+            _Memory.memoryArray[_MemoryAccessor.readTwoMemoryBytesToDecimal(_CurrentPCB.section, this.PC)] = Utils.decimalToHexString(this.ACC);
             // We increment again because we are reading two bytes for the memory address
             this.PC++;
         }
@@ -140,7 +140,7 @@ module TSOS {
         public addWithCarry(){
             this.PC++;
             // We are adding a value stored at a certain place in the memory to the accumulator's value, and storing the result in the accumulator
-            this.ACC += Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)]);
+            this.ACC += Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readTwoMemoryBytesToDecimal(_CurrentPCB.section, this.PC)]);
             // Increment again because we are reading two bytes for the memory address
             this.PC++;
         }
@@ -148,13 +148,13 @@ module TSOS {
         public loadXregFromConstant() {
             this.PC++;
             // Load accumulator with the decimal equivalent of a hex byte
-            this.Xreg = _MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 1);
+            this.Xreg = _MemoryAccessor.readOneMemoryByteToDecimal(_CurrentPCB.section, this.PC);
         }
 
         public loadXregFromMemory() {
             this.PC++;
             // loads accumulator with a value that is stored in memory, with the two byte hex memory given by the next two bytes
-            this.Xreg = Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)]);
+            this.Xreg = Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readTwoMemoryBytesToDecimal(_CurrentPCB.section, this.PC)]);
             // We increment again because we are reading two bytes for the memory address
             this.PC++;
         }
@@ -162,13 +162,13 @@ module TSOS {
         public loadYregFromConstant() {
             this.PC++;
             // Load accumulator with the decimal equivalent of a hex byte
-            this.Yreg = _MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 1);
+            this.Yreg = _MemoryAccessor.readOneMemoryByteToDecimal(_CurrentPCB.section, this.PC);
         }
 
         public loadYregFromMemory() {
             this.PC++;
             // loads accumulator with a value that is stored in memory, with the two byte hex memory given by the next two bytes
-            this.Yreg = Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)]);
+            this.Yreg = Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readTwoMemoryBytesToDecimal(_CurrentPCB.section, this.PC)]);
             // We increment again because we are reading two bytes for the memory address
             this.PC++;
 
@@ -187,7 +187,7 @@ module TSOS {
 
         public compareMemToXreg() {
             this.PC++
-            var byteInMemory = Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)]);
+            var byteInMemory = Utils.hexStringToDecimal(_Memory.memoryArray[_MemoryAccessor.readTwoMemoryBytesToDecimal(_CurrentPCB.section, this.PC)]);
             if (byteInMemory == this.Xreg) {
                 this.Zflag = 1;
             } else {
@@ -200,7 +200,7 @@ module TSOS {
             this.PC++;
             // If the Zflag is zero jump a number of bytes forward, if its more than the section of memory, start back at the beginning again
             if (this.Zflag == 0){
-                var bytes = _MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 1);
+                var bytes = _MemoryAccessor.readOneMemoryByteToDecimal(_CurrentPCB.section, this.PC);
                 if (bytes + this.PC > 256) {
                     this.PC = (this.PC + bytes) % 256;
                 } else {
@@ -212,8 +212,8 @@ module TSOS {
         public incrementByte() {
             this.PC++;
             // increment the value of a byte in memory
-            _Memory.memoryArray[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)] =
-                    Utils.incrementHexString(_Memory.memoryArray[_MemoryAccessor.readMemoryToDecimal(_CurrentPCB.section, this.PC, 2)]);
+            _Memory.memoryArray[_MemoryAccessor.readTwoMemoryBytesToDecimal(_CurrentPCB.section, this.PC)] =
+                    Utils.incrementHexString(_Memory.memoryArray[_MemoryAccessor.readTwoMemoryBytesToDecimal(_CurrentPCB.section, this.PC)]);
             this.PC++;
         }
 
