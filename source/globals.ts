@@ -12,7 +12,7 @@
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
 const APP_NAME: string    = "NASOS";   // Not a Simulation Operating System? Note: I hope changing this doesn't break everything that uses TSOS
-const APP_VERSION: string = "0.2";   // I assume this will be always updated and completely accurate
+const APP_VERSION: string = "0.3";   // I assume this will be always updated and completely accurate
 
 const CPU_CLOCK_INTERVAL: number = 100;   // This is in ms (milliseconds) so 1000 = 1 second.
 
@@ -32,6 +32,7 @@ var _Memory: TSOS.Memory;
 var _MemoryAccessor: TSOS.MemoryAccessor;
 
 var _MemoryManager: any = null;
+var _RRQuantum: number = 6; // Default Round Robin Scheduling Quantum
 
 var _PCBList: TSOS.PCB[] = [];
 var _CurrentPCB: TSOS.PCB = null;
@@ -74,7 +75,6 @@ var _hardwareClockID: number = null;
 var _UserCodeTextArea: HTMLTextAreaElement; // Used to store user code entered into the text area
 
 var _SingleStep: boolean = false;       // Based on whether or not the user wants to go step by step
-
 var _GoNextStep: boolean = false;       // Is false until the user clicks the step next button, then which it turns true and allows one cycle
 
 // For testing (and enrichment)...

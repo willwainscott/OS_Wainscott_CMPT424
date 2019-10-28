@@ -11,7 +11,7 @@
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
 var APP_NAME = "NASOS"; // Not a Simulation Operating System? Note: I hope changing this doesn't break everything that uses TSOS
-var APP_VERSION = "0.2"; // I assume this will be always updated and completely accurate
+var APP_VERSION = "0.3"; // I assume this will be always updated and completely accurate
 var CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
@@ -25,6 +25,7 @@ var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is 
 var _Memory;
 var _MemoryAccessor;
 var _MemoryManager = null;
+var _RRQuantum = 6; // Default Round Robin Scheduling Quantum
 var _PCBList = [];
 var _CurrentPCB = null;
 var _ActivePCBList = [];

@@ -12,8 +12,29 @@ module TSOS {
 
         constructor() {}
 
-        public clearMemory(firstIndex: number, lastIndex: number) {
+        public clearMemory(section: string) {
             // resets the memory within a given section to all "00"
+            var firstIndex = 0;
+            var lastIndex = 0;
+            switch (section){
+                case "1":
+                    firstIndex = 0;
+                    lastIndex = 255;
+                    break;
+                case "2":
+                    firstIndex = 256;
+                    lastIndex = 511;
+                    break;
+                case "3":
+                    firstIndex = 512;
+                    lastIndex = 767;
+                case "all":
+                    firstIndex = 0;
+                    lastIndex = 767;
+                default:
+                    console.log("Invalid section when calling MemoryManager.clearMemory()");
+            }
+
             for (var i = firstIndex; i <= lastIndex; i++) {
                 _Memory.memoryArray[i] = "00";
             }
@@ -41,6 +62,11 @@ module TSOS {
 
             return section;
 
+        }
+
+        public schedulingDecision() {
+            // Make a PCB the current PCB based on what is running or waiting
+            // Also account for a process ending and there being no more processes to be run
         }
 
     }

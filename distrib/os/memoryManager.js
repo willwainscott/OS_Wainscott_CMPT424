@@ -10,8 +10,28 @@ var TSOS;
     var MemoryManager = /** @class */ (function () {
         function MemoryManager() {
         }
-        MemoryManager.prototype.clearMemory = function (firstIndex, lastIndex) {
+        MemoryManager.prototype.clearMemory = function (section) {
             // resets the memory within a given section to all "00"
+            var firstIndex = 0;
+            var lastIndex = 0;
+            switch (section) {
+                case "1":
+                    firstIndex = 0;
+                    lastIndex = 255;
+                    break;
+                case "2":
+                    firstIndex = 256;
+                    lastIndex = 511;
+                    break;
+                case "3":
+                    firstIndex = 512;
+                    lastIndex = 767;
+                case "all":
+                    firstIndex = 0;
+                    lastIndex = 767;
+                default:
+                    console.log("Invalid section when calling MemoryManager.clearMemory()");
+            }
             for (var i = firstIndex; i <= lastIndex; i++) {
                 _Memory.memoryArray[i] = "00";
             }
@@ -31,6 +51,10 @@ var TSOS;
             // But thats a problem for iP3
             var section = "1";
             return section;
+        };
+        MemoryManager.prototype.schedulingDecision = function () {
+            // Make a PCB the current PCB based on what is running or waiting
+            // Also account for a process ending and there being no more processes to be run
         };
         return MemoryManager;
     }());

@@ -116,8 +116,41 @@ module TSOS {
                                   "<PID> - Runs a process based on a given Process ID.");
             this.commandList[this.commandList.length] = sc;
 
+            //runall
+            sc = new ShellCommand(this.shellRunAll,
+                                  "runall",
+                                  "- Runs all processes loaded into memory at once.");
+            this.commandList[this.commandList.length] = sc;
+
+            //clearmem
+            sc = new ShellCommand(this.shellClearMem,
+                                  "clearmem",
+                                  "- Clears all of the memory partitions.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
+            sc = new ShellCommand(this.shellPS,
+                                  "ps",
+                                  "- Lists the PID and state of running processes.");
+            this.commandList[this.commandList.length] = sc;
+
             // kill <id> - kills the specified process id.
+            sc = new ShellCommand(this.shellKill,
+                                  "kill",
+                                  "<PID> - Kills a specified process.");
+            this.commandList[this.commandList.length] = sc;
+
+            // killall
+            sc = new ShellCommand(this.shellKillAll,
+                                  "killall",
+                                  "- Kills all running processes.");
+            this.commandList[this.commandList.length] = sc;
+
+            //quantum
+            sc = new ShellCommand(this.shellQuantum,
+                                  "quantum",
+                                  "- Changes the round robin quantum.");
+            this.commandList[this.commandList.length] = sc;
 
             // Display the initial prompt.
             this.putPrompt();
@@ -334,6 +367,24 @@ module TSOS {
                     case "run":
                         _StdOut.putText("Runs a loaded program based on the Process ID.");
                         break;
+                    case "runall":
+                        _StdOut.putText("Runs all loaded programs in the \"Resident\" state.");
+                        break;
+                    case "clearmem":
+                        _StdOut.putText("Clears all of the memory partitions.");
+                        break;
+                    case "ps":
+                        _StdOut.putText("Displays the PID of every process and their state.");
+                        break;
+                    case "kill":
+                        _StdOut.putText("Kills a specified process, changing its state to \"Terminated\".");
+                        break;
+                    case "killall":
+                        _StdOut.putText("Kills all running processes (if any), chaing their state to \"Terminated\".");
+                        break;
+                    case "quantum":
+                        _StdOut.putText("Changes the round robin quantum for process scheduling.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -532,7 +583,7 @@ module TSOS {
 
         public shellRun(args: string[]) {
             // Check to see if the entered PID is valid
-            if (args.length > 0 && !(isNaN(Number(args[0])))) { //Checks to see if the arg is there and is actually a number
+            if ((args.length = 1) && !(isNaN(Number(args[0])))) { //Checks to see if the arg is there and is actually a number
                 var enteredPID = Number(args[0]);
                 // Checks to see if the PID exists and hasn't already been run or terminated
                 if(enteredPID < _PCBList.length && _PCBList[enteredPID].state != "Terminated" && _PCBList[enteredPID].state != "Complete") {
@@ -550,8 +601,72 @@ module TSOS {
             } else {
                 _StdOut.putText("Please enter a PID number.")
             }
+        }
 
-            //Run the program
+        public shellRunAll(args: string[]) {
+            for (var i = 0; i < _PCBList.length; i++) {
+                // If the process is loaded ...
+                if (_PCBList[i].state = "Resident") {
+                    // ... Make it in the queue to be run ...
+                    _PCBList[i].state = "Waiting";
+                    // ... make sure the cpu is executing if it wasn't already
+                    if (!_CPU.isExecuting){
+                        _CPU.isExecuting = true;
+                    }
+                }
+            }
+        }
+
+        public shellClearMem(args: string[]) {
+            // Clears all section in memory. Could potentialy have it such that it only clears certain sections
+            _MemoryManager.clearMemory("all");
+        }
+
+        public shellPS(args: string[]) {
+            // Prints out the PID and state for each PCB
+            for (var i = 0; i < _PCBList.length; i++){
+                _StdOut.putText("Process ID: " + _PCBList[i].PID + " State: " + _PCBList[i].state);
+                _StdOut.advanceLine();
+            }
+        }
+
+        public shellKill(args: string[]) {
+            // Check to see if the entered PID is valid
+            if ((args.length = 1) && !(isNaN(Number(args[0])))) { //Checks to see if the arg is there and is actually a number
+                var enteredPID = Number(args[0]);
+                // Check to make sure the process is running or waiting
+                if ((_PCBList[enteredPID].state = "Running") || (_PCBList[enteredPID].state = "Waiting")) {
+                    // ... Terminate the process ...
+                    _PCBList[enteredPID].state = "Terminated";
+                    // ... If it was the current process make, scheduling decision ...
+                    _MemoryManager.schedulingDecision();
+                } else {
+                    _StdOut.putText("Ensure the entered PID number is valid.")
+                }
+            } else {
+                _StdOut.putText("Please enter a PID number.")
+            }
+        }
+
+        public shellKillAll(args: string[]) {
+            for (var i = 0; i < _PCBList.length; i++) {
+                // If the process os running or waiting ...
+                if ((_PCBList[i].state = "Running") || (_PCBList[i].state = "Waiting")) {
+                    // ... Terminate it
+                    _PCBList[i].state = "Terminated";
+                }
+            }
+            // Stop the CPU from executing, because all the processes have been killed
+            _CPU.isExecuting = false;
+        }
+
+        public shellQuantum(args: string[]) {
+            // Check to see if the entered Quantum is valid
+            if ((args.length = 1) && !(isNaN(Number(args[0])))) { //Checks to see if the arg is there and is actually a number
+                _RRQuantum = parseInt(args[0]);
+            } else {
+                _StdOut.putText("Please enter a valid quantum");
+            }
         }
     }
 }
