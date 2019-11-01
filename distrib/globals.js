@@ -17,6 +17,7 @@ var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt prior
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ = 1;
 var SYSTEM_CALL_IRQ = 2;
+var PROCESS_BREAK_IRQ = 3;
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
@@ -28,7 +29,7 @@ var _MemoryManager = null;
 var _RRQuantum = 6; // Default Round Robin Scheduling Quantum
 var _PCBList = [];
 var _CurrentPCB = null;
-var _ActivePCBList = [];
+var _ReadyPCBList = [];
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Canvas; // Initialized in Control.hostInit().

@@ -52,28 +52,32 @@ module TSOS {
 
 
             // Run the next code
-
-            switch (_CurrentPCB.IR) {
-                case "A9": this.loadAccConstant();          break;  //load accumulator with a constant
-                case "AD": this.loadAccMemory();            break;  //load accumulator from memory
-                case "8D": this.storeAcc();                 break;  //store accumulator in memory
-                case "6D": this.addWithCarry();             break;  //add contents of memory to accumulator and store in accumulator
-                case "A2": this.loadXregFromConstant();     break;  //load Xreg with a constant
-                case "AE": this.loadXregFromMemory();       break;  //load Xreg from memory
-                case "A0": this.loadYregFromConstant();     break;  //load Yreg with a constant
-                case "AC": this.loadYregFromMemory();       break;  //load Yreg from memory
-                case "EA":                                  break;  //no operation (we increment PC after the switch statement, so we don't get stuck here)
-                case "00": this.breakProcess();             break;  //break
-                case "EC": this.compareMemToXreg();         break;  //compare byte in memory to Xreg, set Zflag to one if equal
-                case "D0": this.branchBytes();              break;  //branch a given amount of bytes if Zflag is zero
-                case "EE": this.incrementByte();            break;  //increment the value of a byte
-                case "FF": this.systemCall();               break;  //system call (used for printing stuff)
-                default:
-                    // There was an invalid op code
-                    console.log("Invalid Op Code");
-                    // probably write some sort of notice to the user that something is broken
+            try {
+                switch (_CurrentPCB.IR) {
+                    case "A9": this.loadAccConstant();          break;  //load accumulator with a constant
+                    case "AD": this.loadAccMemory();            break;  //load accumulator from memory
+                    case "8D": this.storeAcc();                 break;  //store accumulator in memory
+                    case "6D": this.addWithCarry();             break;  //add contents of memory to accumulator and store in accumulator
+                    case "A2": this.loadXregFromConstant();     break;  //load Xreg with a constant
+                    case "AE": this.loadXregFromMemory();       break;  //load Xreg from memory
+                    case "A0": this.loadYregFromConstant();     break;  //load Yreg with a constant
+                    case "AC": this.loadYregFromMemory();       break;  //load Yreg from memory
+                    case "EA":                                  break;  //no operation (we increment PC after the switch statement, so we don't get stuck here)
+                    case "00": this.breakProcess();             break;  //break
+                    case "EC": this.compareMemToXreg();         break;  //compare byte in memory to Xreg, set Zflag to one if equal
+                    case "D0": this.branchBytes();              break;  //branch a given amount of bytes if Zflag is zero
+                    case "EE": this.incrementByte();            break;  //increment the value of a byte
+                    case "FF": this.systemCall();               break;  //system call (used for printing stuff)
+                    default:
+                        // There was an invalid op code
+                        console.log("Invalid Op Code");
+                        var params: string[] = ['Running Process Invalid Op Code'];
+                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_BREAK_IRQ, params));
+                }
+            } catch (Error) {
+                var params: string[] = ['Running Process Memory Access Violation'];
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_BREAK_IRQ, params));
             }
-
             // Increment the PC so we know to go on the next command the next cpu cycle for this process
             this.PC++;
 

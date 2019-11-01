@@ -44,7 +44,7 @@ module TSOS {
             // make array of the entered commands
             var userInputArray = userInput.split(" ");
             // load them into memory
-            for (var i = _MemoryAccessor.sectionToIndex(section); i < userInputArray.length; i++){
+            for (var i = _Memory.getBaseBySection(section); i < _Memory.getBaseBySection(section) + userInputArray.length; i++){
                 _Memory.memoryArray[i] = userInputArray[i];
             }
         }

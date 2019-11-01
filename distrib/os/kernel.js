@@ -33,6 +33,7 @@ var TSOS;
             this.krnTrace(_krnKeyboardDriver.status);
             // Make a new Memory Manager
             _MemoryManager = new TSOS.MemoryManager();
+            // Make a new Scheduler W TODO
             //
             // ... more?
             //
@@ -120,6 +121,17 @@ var TSOS;
                     break;
                 case SYSTEM_CALL_IRQ: // User code system call
                     _StdOut.putText(params[0]);
+                    break;
+                case PROCESS_BREAK_IRQ: // Ctrl-C or Other Error causing process to stop and be killed
+                    _CurrentPCB.state = "Terminated";
+                    _PCBList[_CurrentPCB.PID] = _CurrentPCB;
+                    // Remove PCB from ready queue?
+                    TSOS.Control.updateAllTables();
+                    _StdOut.advanceLine();
+                    _StdOut.putText("Process " + _CurrentPCB.PID + " Terminated due to: " + params[0]);
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
+                    // _Scheduler.makeDecision();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

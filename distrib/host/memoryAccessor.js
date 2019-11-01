@@ -21,42 +21,28 @@ var TSOS;
             // returns a decimal representation of the next hex pair yet to be run/read
             var hex = "";
             // Reads the next byte in memory
-            hex = _Memory.memoryArray[this.sectionToIndex(section) + PC];
+            hex = _Memory.memoryArray[_Memory.getBaseBySection(section) + PC];
             return TSOS.Utils.hexStringToDecimal(hex);
         };
         MemoryAccessor.prototype.readTwoMemoryBytesToDecimal = function (section, PC) {
             // returns a decimal representation of two hex bytes
             var hex = "";
             // we read the two bytes by reading the second code first
-            hex = _Memory.memoryArray[this.sectionToIndex(section) + PC + 1];
-            hex += _Memory.memoryArray[this.sectionToIndex(section) + PC];
-            return TSOS.Utils.hexStringToDecimal(hex);
+            hex = _Memory.memoryArray[_Memory.getBaseBySection(section) + PC + 1];
+            hex += _Memory.memoryArray[_Memory.getBaseBySection(section) + PC];
+            var index = TSOS.Utils.hexStringToDecimal(hex);
+            if (index > _Memory.getLimitBySection(section)) {
+                console.log("Memory out of bounds error");
+                throw (Error);
+            }
+            else {
+                return TSOS.Utils.hexStringToDecimal(hex);
+            }
         };
         MemoryAccessor.prototype.readMemoryToHex = function (section, PC) {
             // return the actual hex string of the next hex pair yet to be run/read
-            var hex = _Memory.memoryArray[this.sectionToIndex(section) + PC];
+            var hex = _Memory.memoryArray[_Memory.getBaseBySection(section) + PC];
             return hex;
-        };
-        MemoryAccessor.prototype.sectionToIndex = function (section) {
-            var i;
-            switch (section) {
-                case "1":
-                    i = 0;
-                    break;
-                case "2":
-                    i = 256;
-                    break;
-                case "3":
-                    i = 512;
-                    break;
-                case "disk":
-                    // oh boy
-                    break;
-                default:
-                    // IF we get here, something broke
-                    console.log("Invalid section. Something broke.");
-            }
-            return i;
         };
         return MemoryAccessor;
     }());

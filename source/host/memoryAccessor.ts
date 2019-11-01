@@ -31,28 +31,35 @@ module TSOS {
             // returns a decimal representation of the next hex pair yet to be run/read
             var hex: string = "";
             // Reads the next byte in memory
-            hex = _Memory.memoryArray[this.sectionToIndex(section) + PC];
+            hex = _Memory.memoryArray[_Memory.getBaseBySection(section) + PC];
 
             return Utils.hexStringToDecimal(hex);
         }
 
         public readTwoMemoryBytesToDecimal(section: string, PC:number) {
             // returns a decimal representation of two hex bytes
-            var hex:string = "";
+            var hex: string = "";
             // we read the two bytes by reading the second code first
-            hex = _Memory.memoryArray[this.sectionToIndex(section) + PC + 1];
-            hex += _Memory.memoryArray[this.sectionToIndex(section) + PC];
+            hex = _Memory.memoryArray[_Memory.getBaseBySection(section) + PC + 1];
+            hex += _Memory.memoryArray[_Memory.getBaseBySection(section) + PC];
 
-            return Utils.hexStringToDecimal(hex);
+            var index = Utils.hexStringToDecimal(hex);
+            if (index > _Memory.getLimitBySection(section)) {
+                console.log("Memory out of bounds error");
+                throw (Error);
+            } else {
+                return Utils.hexStringToDecimal(hex);
+            }
         }
 
 
         public readMemoryToHex(section: string, PC: number) {
             // return the actual hex string of the next hex pair yet to be run/read
-            var hex: string = _Memory.memoryArray[this.sectionToIndex(section) + PC];
+            var hex: string = _Memory.memoryArray[_Memory.getBaseBySection(section) + PC];
             return hex;
         }
 
+        /* This has been replaced by the Base and Limit registers in the Memory class itself
         public sectionToIndex(section) {
             var i: number;
             switch (section) {
@@ -74,7 +81,7 @@ module TSOS {
             }
             return i;
 
-        }
+        } */
 
     }
 
