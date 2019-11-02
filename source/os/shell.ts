@@ -534,48 +534,55 @@ module TSOS {
             if (valid) {
                 _StdOut.putText("Entered user code is valid.");
                 _StdOut.advanceLine();
-                // hehehe
-                if (_SarcasticMode){
-                    _StdOut.putText("Congrats, you're not completely useless.");
+
+                if (_MemoryManager.memoryAvailabilityCheck()) {
+                    //Make every character in the codes uppercase
+                    userCode = userCode.toUpperCase();
+                    //load it into memory ...
+
+                    // create a PCB
+                    var PCB = new TSOS.PCB();
+
+                    // give it a PID
+                    PCB.PID = _PIDCounter;
+                    _PIDCounter++;  // Increment to prevent duplicate PIDs
+
+                    // Assign it a section in memory
+                    PCB.section = _MemoryManager.assignMemorySection();
+
+                    //Add it to global list of Resident PCBs
+                    _PCBList[parseInt(PCB.section) - 1] = PCB;
+
+                    console.log(_PCBList);
+
+                    //clear memory before loading
+                    // NOTE: Will probably change it such that when a program is completed or terminated the memory is cleared
+                    // instead of keeping the old program in memory and only removing it when a new one is loaded
+                    _MemoryManager.clearMemory(PCB.section);
+
+                    //use memory manager to load
+                    _MemoryManager.loadMemory(userCode, PCB.section);
+
+                    // Update the PCB's IR
+                    PCB.IR = _MemoryAccessor.readMemoryToHex(PCB.section, PCB.PC);
+
+                    // Update Memory GUI
+                    Control.memoryTableUpdate();
+
+                    // Update PCB GUI
+                    Control.processTableUpdate();
+
+                    // print out response
+                    _StdOut.putText("User code loaded successfully");
                     _StdOut.advanceLine();
+                    if (_SarcasticMode){
+                        _StdOut.putText("Congrats, you're not completely useless.");
+                        _StdOut.advanceLine();
+                    }
+                    _StdOut.putText("Process ID Number: " + PCB.PID);
+                } else {
+                    _StdOut.putText("Memory is full. Please run a process or clear the memory to load.");
                 }
-                //Make every character in the codes uppercase
-                userCode = userCode.toUpperCase();
-                //load it into memory ...
-
-                // create a PCB
-                var PCB = new TSOS.PCB();
-                PCB.section = _MemoryManager.assignMemorySection();
-                _PCBList[_PCBList.length] = PCB;
-                // For now we use this because we can only have one program in memory, and
-                // we want it to overwrite the existing program (like you said in class)
-                // and we shouldn't be able to run a program that isn't in memory, so we change its state to Terminated
-                if (_PCBList.length > 1 && _PCBList[PCB.PID - 1].state != "Complete") { // If there is another PCB
-                    _PCBList[_PCBList.length - 2].state = "Terminated";
-                }
-
-                console.log(_PCBList);
-
-                //clear memory before loading
-                _MemoryManager.clearMemory(PCB.section); //This is just the whole memory array for now, will change once we add more processes
-
-                //use memory manager to load
-                _MemoryManager.loadMemory(userCode, PCB.section); //This accepts the starting index, will probably change to the section (1,2,or 3)
-                                                       // of the memory, once we add the other two sections
-                // Update the PCB's IR
-                PCB.IR = _MemoryAccessor.readMemoryToHex(PCB.section, PCB.PC);
-
-                // Update Memory GUI
-                Control.memoryTableUpdate();
-
-                // Update PCB GUI
-                Control.processTableUpdate();
-
-                // print out response
-                _StdOut.putText("User code loaded successfully");
-                _StdOut.advanceLine();
-                _StdOut.putText("Process ID Number: " + PCB.PID);
-
             } else {
                 _StdOut.putText("Please ensure user code is valid hexadecimal");
             }
@@ -618,8 +625,12 @@ module TSOS {
         }
 
         public shellClearMem(args: string[]) {
-            // Clears all section in memory. Could potentialy have it such that it only clears certain sections
+            // Clears all section in memory. Could potentially have it such that it only clears certain sections
+            if (_CPU.isExecuting) {
+                _StdOut.putText("Memory can only be cleared when programs are not running.");
+            } else {
             _MemoryManager.clearMemory("all");
+            }
         }
 
         public shellPS(args: string[]) {

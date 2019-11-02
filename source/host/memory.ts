@@ -57,6 +57,7 @@ module TSOS {
                     return this.sectionThreeLimit;
                     break;
                 default:
+                    console.log(section);
                     console.log("Invalid section number when calling Memory.getLimitBySection()");
             }
         }

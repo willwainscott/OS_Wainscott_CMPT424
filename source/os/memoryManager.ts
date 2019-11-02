@@ -26,24 +26,40 @@ module TSOS {
             // make array of the entered commands
             var userInputArray = userInput.split(" ");
             // load them into memory
-            for (var i = _Memory.getBaseBySection(section); i < _Memory.getBaseBySection(section) + userInputArray.length; i++){
-                _Memory.memoryArray[i] = userInputArray[i];
+            for (var i = 0; i < userInputArray.length; i++){
+                _Memory.memoryArray[i + _Memory.getBaseBySection(section)] = userInputArray[i];
             }
         }
 
+        public memoryAvailabilityCheck() {
+            return (_PCBList.length < 3);
+        }
+
         public assignMemorySection() {
-            var section = "";
+            // This is where we would check to see if there is something in memory in specific sections
+            var sectionOneOpen = true;
+            var sectionTwoOpen = true;
+            var sectionThreeOpen = true;
 
-            // This is where we would check to see if there is something in memory in specfic sections
-            // Probably by checking the list of active PCBs for ones with the section strings of 1,2,3, and disk
-            // But thats a problem for iP3
-
-            var section = "1";
-
-
-
-            return section;
-
+            // Loop through each resident PCB looking for a section to load it into
+            for (var PCB of _PCBList) {
+                switch (PCB.section) {
+                    case "1": sectionOneOpen   =  false; break;
+                    case "2": sectionTwoOpen   =  false; break;
+                    case "3": sectionThreeOpen =  false; break;
+                    default: console.log("Invalid section when trying to check available memory sections")
+                }
+            }
+            // return a section based on the ones available
+            if (sectionOneOpen) {
+                return "1";
+            } else if (sectionTwoOpen) {
+                return "2";
+            } else if (sectionThreeOpen) {
+                return "3";
+            } else {
+                console.log("Something broke when trying to assign memory section");
+            }
         }
 
         public schedulingDecision() {

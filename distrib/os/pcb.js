@@ -18,7 +18,7 @@ var TSOS;
         state, //State of the process
         location, //Location (in memory/on the disk)
         section) {
-            if (PID === void 0) { PID = _PCBList.length; }
+            if (PID === void 0) { PID = 0; }
             if (PC === void 0) { PC = 0; }
             if (IR === void 0) { IR = ""; }
             if (ACC === void 0) { ACC = 0; }

@@ -37,6 +37,7 @@ var _RRQuantum: number = 6; // Default Round Robin Scheduling Quantum
 var _PCBList: TSOS.PCB[] = [];
 var _CurrentPCB: TSOS.PCB = null;
 var _ReadyPCBList: TSOS.PCB[] = [];
+var _PIDCounter: number = 0;
 
 var _OSclock: number = 0;  // Page 23.
 

@@ -22,17 +22,47 @@ var TSOS;
             // make array of the entered commands
             var userInputArray = userInput.split(" ");
             // load them into memory
-            for (var i = _Memory.getBaseBySection(section); i < _Memory.getBaseBySection(section) + userInputArray.length; i++) {
-                _Memory.memoryArray[i] = userInputArray[i];
+            for (var i = 0; i < userInputArray.length; i++) {
+                _Memory.memoryArray[i + _Memory.getBaseBySection(section)] = userInputArray[i];
             }
         };
+        MemoryManager.prototype.memoryAvailabilityCheck = function () {
+            return (_PCBList.length < 3);
+        };
         MemoryManager.prototype.assignMemorySection = function () {
-            var section = "";
-            // This is where we would check to see if there is something in memory in specfic sections
-            // Probably by checking the list of active PCBs for ones with the section strings of 1,2,3, and disk
-            // But thats a problem for iP3
-            var section = "1";
-            return section;
+            // This is where we would check to see if there is something in memory in specific sections
+            var sectionOneOpen = true;
+            var sectionTwoOpen = true;
+            var sectionThreeOpen = true;
+            // Loop through each resident PCB looking for a section to load it into
+            for (var _i = 0, _PCBList_1 = _PCBList; _i < _PCBList_1.length; _i++) {
+                var PCB = _PCBList_1[_i];
+                switch (PCB.section) {
+                    case "1":
+                        sectionOneOpen = false;
+                        break;
+                    case "2":
+                        sectionTwoOpen = false;
+                        break;
+                    case "3":
+                        sectionThreeOpen = false;
+                        break;
+                    default: console.log("Invalid section when trying to check available memory sections");
+                }
+            }
+            // return a section based on the ones available
+            if (sectionOneOpen) {
+                return "1";
+            }
+            else if (sectionTwoOpen) {
+                return "2";
+            }
+            else if (sectionThreeOpen) {
+                return "3";
+            }
+            else {
+                console.log("Something broke when trying to assign memory section");
+            }
         };
         MemoryManager.prototype.schedulingDecision = function () {
             // Make a PCB the current PCB based on what is running or waiting
