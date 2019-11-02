@@ -557,10 +557,10 @@ module TSOS {
                 console.log(_PCBList);
 
                 //clear memory before loading
-                _MemoryManager.clearMemory(0,255); //This is just the whole memory array for now, will change once we add more processes
+                _MemoryManager.clearMemory(PCB.section); //This is just the whole memory array for now, will change once we add more processes
 
                 //use memory manager to load
-                _MemoryManager.loadMemory(userCode,"1"); //This accepts the starting index, will probably change to the section (1,2,or 3)
+                _MemoryManager.loadMemory(userCode, PCB.section); //This accepts the starting index, will probably change to the section (1,2,or 3)
                                                        // of the memory, once we add the other two sections
                 // Update the PCB's IR
                 PCB.IR = _MemoryAccessor.readMemoryToHex(PCB.section, PCB.PC);

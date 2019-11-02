@@ -14,26 +14,8 @@ module TSOS {
 
         public clearMemory(section: string) {
             // resets the memory within a given section to all "00"
-            var firstIndex = 0;
-            var lastIndex = 0;
-            switch (section){
-                case "1":
-                    firstIndex = 0;
-                    lastIndex = 255;
-                    break;
-                case "2":
-                    firstIndex = 256;
-                    lastIndex = 511;
-                    break;
-                case "3":
-                    firstIndex = 512;
-                    lastIndex = 767;
-                case "all":
-                    firstIndex = 0;
-                    lastIndex = 767;
-                default:
-                    console.log("Invalid section when calling MemoryManager.clearMemory()");
-            }
+            var firstIndex = _Memory.getBaseBySection(section);
+            var lastIndex = _Memory.getLimitBySection(section);
 
             for (var i = firstIndex; i <= lastIndex; i++) {
                 _Memory.memoryArray[i] = "00";

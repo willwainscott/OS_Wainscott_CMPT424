@@ -27,6 +27,9 @@ var TSOS;
                 case "3":
                     return this.sectionThreeBase;
                     break;
+                case "all":
+                    return this.sectionOneBase;
+                    break;
                 default:
                     console.log("Invalid section number when calling Memory.getBaseBySection()");
             }
@@ -40,6 +43,9 @@ var TSOS;
                     return this.sectionTwoLimit;
                     break;
                 case "3":
+                    return this.sectionThreeLimit;
+                    break;
+                case "all":
                     return this.sectionThreeLimit;
                     break;
                 default:
