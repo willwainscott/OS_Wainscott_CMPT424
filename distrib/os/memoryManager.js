@@ -64,9 +64,28 @@ var TSOS;
                 console.log("Something broke when trying to assign memory section");
             }
         };
-        MemoryManager.prototype.schedulingDecision = function () {
-            // Make a PCB the current PCB based on what is running or waiting
-            // Also account for a process ending and there being no more processes to be run
+        MemoryManager.prototype.getPCBByPID = function (givenPID) {
+            for (var _i = 0, _PCBList_2 = _PCBList; _i < _PCBList_2.length; _i++) {
+                var PCB = _PCBList_2[_i];
+                if (PCB.PID == givenPID) {
+                    return PCB;
+                }
+            }
+        };
+        MemoryManager.prototype.PCBisResident = function (givenPID) {
+            for (var _i = 0, _PCBList_3 = _PCBList; _i < _PCBList_3.length; _i++) {
+                var PCB = _PCBList_3[_i];
+                if (PCB.PID == givenPID) {
+                    return true;
+                }
+            }
+        };
+        MemoryManager.prototype.getIndexByPID = function (list, givenPID) {
+            for (var i = 0; i < list.length; i++) {
+                if (list[i].PID == givenPID) {
+                    return i;
+                }
+            }
         };
         return MemoryManager;
     }());

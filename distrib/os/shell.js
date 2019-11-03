@@ -471,7 +471,7 @@ var TSOS;
                     // Assign it a section in memory
                     PCB.section = _MemoryManager.assignMemorySection();
                     //Add it to global list of Resident PCBs
-                    _PCBList[parseInt(PCB.section) - 1] = PCB;
+                    _PCBList[_PCBList.length] = PCB;
                     console.log(_PCBList);
                     //clear memory before loading
                     // NOTE: Will probably change it such that when a program is completed or terminated the memory is cleared
@@ -506,16 +506,16 @@ var TSOS;
             // Check to see if the entered PID is valid
             if ((args.length = 1) && !(isNaN(Number(args[0])))) { //Checks to see if the arg is there and is actually a number
                 var enteredPID = Number(args[0]);
-                // Checks to see if the PID exists and hasn't already been run or terminated
-                if (enteredPID < _PCBList.length && _PCBList[enteredPID].state != "Terminated" && _PCBList[enteredPID].state != "Complete") {
-                    //make the entered PCB the current PCB
-                    _CurrentPCB = _PCBList[enteredPID]; // This will eventually be replaced by the scheduler
+                // Checks to see if the PID is loaded into memory
+                if (_MemoryManager.PCBisResident(enteredPID)) {
                     // change the PCB status to waiting
-                    _PCBList[enteredPID].state = "Waiting"; // For P2 this could be "Running", but later (P3+) it wouldn't make sense
+                    _PCBList[_MemoryManager.getIndexByPID(_PCBList, enteredPID)].state = "Waiting";
+                    // add the process to the ready queue
+                    _ReadyPCBList[_ReadyPCBList.length] = _MemoryManager.getPCBByPID(enteredPID);
                     // Make GoNextStep false in case they hit the next step button while there was no process running
                     _GoNextStep = false;
-                    // make CPU.isExecuting to true
-                    _CPU.isExecuting = true;
+                    // Make scheduling decision
+                    _Scheduler.makeDecision();
                 }
                 else {
                     _StdOut.putText("Ensure the entered PID number is valid.");
@@ -531,10 +531,8 @@ var TSOS;
                 if (_PCBList[i].state = "Resident") {
                     // ... Make it in the queue to be run ...
                     _PCBList[i].state = "Waiting";
-                    // ... make sure the cpu is executing if it wasn't already
-                    if (!_CPU.isExecuting) {
-                        _CPU.isExecuting = true;
-                    }
+                    // Make scheduling decision
+                    _Scheduler.makeDecision();
                 }
             }
         };
@@ -562,8 +560,8 @@ var TSOS;
                 if ((_PCBList[enteredPID].state = "Running") || (_PCBList[enteredPID].state = "Waiting")) {
                     // ... Terminate the process ...
                     _PCBList[enteredPID].state = "Terminated";
-                    // ... If it was the current process make, scheduling decision ...
-                    _MemoryManager.schedulingDecision();
+                    // ... If it was the current process, make scheduling decision ...
+                    _Scheduler.makeDecision();
                 }
                 else {
                     _StdOut.putText("Ensure the entered PID number is valid.");

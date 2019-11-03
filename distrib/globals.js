@@ -18,6 +18,7 @@ var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt prior
 var KEYBOARD_IRQ = 1;
 var SYSTEM_CALL_IRQ = 2;
 var PROCESS_BREAK_IRQ = 3;
+var CONTEXT_SWITCH_IRQ = 4;
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
@@ -26,6 +27,7 @@ var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is 
 var _Memory;
 var _MemoryAccessor;
 var _MemoryManager = null;
+var _Scheduler = null;
 var _RRQuantum = 6; // Default Round Robin Scheduling Quantum
 var _PCBList = [];
 var _CurrentPCB = null;

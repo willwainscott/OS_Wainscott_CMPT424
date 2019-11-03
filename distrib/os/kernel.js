@@ -34,6 +34,7 @@ var TSOS;
             // Make a new Memory Manager
             _MemoryManager = new TSOS.MemoryManager();
             // Make a new Scheduler W TODO
+            _Scheduler = new TSOS.Scheduler();
             //
             // ... more?
             //
@@ -132,6 +133,9 @@ var TSOS;
                     _StdOut.advanceLine();
                     _OsShell.putPrompt();
                     // _Scheduler.makeDecision();
+                    break;
+                case CONTEXT_SWITCH_IRQ: // Changing the process that the CPU is running
+                    _CurrentPCB = params[0];
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

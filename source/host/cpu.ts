@@ -36,6 +36,8 @@ module TSOS {
         }
 
         public cycle(): void {
+            var isCompleted = false;
+
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
@@ -63,7 +65,7 @@ module TSOS {
                     case "A0": this.loadYregFromConstant();     break;  //load Yreg with a constant
                     case "AC": this.loadYregFromMemory();       break;  //load Yreg from memory
                     case "EA":                                  break;  //no operation (we increment PC after the switch statement, so we don't get stuck here)
-                    case "00": this.breakProcess();             break;  //break
+                    case "00": isCompleted = true;              break;  //break function (the process is completed)
                     case "EC": this.compareMemToXreg();         break;  //compare byte in memory to Xreg, set Zflag to one if equal
                     case "D0": this.branchBytes();              break;  //branch a given amount of bytes if Zflag is zero
                     case "EE": this.incrementByte();            break;  //increment the value of a byte
@@ -87,11 +89,12 @@ module TSOS {
             // Copy the CPU to the CurrentPCB
             this.updatePCBWithCPU();
 
-            // Copy Current PCB to the _PCBList
-            this.updatePCBList();
-
             // Update the GUI again
             Control.updateAllTables();
+
+            if (isCompleted) {
+                this.breakProcess();
+            }
 
         }
 
@@ -112,9 +115,6 @@ module TSOS {
             _CurrentPCB.Yreg = this.Yreg;
             _CurrentPCB.Zflag = this.Zflag;
 
-        }
-        public updatePCBList() {
-            _PCBList[_CurrentPCB.PID] = _CurrentPCB;
         }
 
         //Op code functionality
@@ -179,14 +179,22 @@ module TSOS {
         }
 
         public breakProcess() {
-            // stops the program from running
-            _CPU.isExecuting = false;
-            _CurrentPCB.state = "Complete";
+            // the program is completed...
             // I don't know if  I shouldn't be doing this OS stuff in the cpu. May need to change for better host/OS separation
             _StdOut.advanceLine();
             _StdOut.putText("Process " + _CurrentPCB.PID + " Complete!");
             _StdOut.advanceLine();
             _OsShell.putPrompt();
+            // clear that section in memory
+            // _MemoryManager.clearSection(_CurrentPCB.section);
+            // remove PCB from _ReadyPCBList and _PCBList
+            _ReadyPCBList.splice(_MemoryManager.getIndexByPID(_ReadyPCBList,_CurrentPCB.PID), 1); // the two parameters are the index and the number of PCBs removed
+            _PCBList.splice(_MemoryManager.getIndexByPID(_PCBList,_CurrentPCB.PID), 1);
+            // remove PCB from _CurrentPCB
+            _CurrentPCB = null;
+            Control.updateAllTables();
+            Control.CPUTableClear();
+            _Scheduler.makeDecision();
         }
 
         public compareMemToXreg() {

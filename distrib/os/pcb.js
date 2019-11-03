@@ -17,7 +17,8 @@ var TSOS;
         Zflag, //Z Flag
         state, //State of the process
         location, //Location (in memory/on the disk)
-        section) {
+        section, //The section of memory it is in (or on the hard drive)
+        quantaRun) {
             if (PID === void 0) { PID = 0; }
             if (PC === void 0) { PC = 0; }
             if (IR === void 0) { IR = ""; }
@@ -28,6 +29,7 @@ var TSOS;
             if (state === void 0) { state = "Resident"; }
             if (location === void 0) { location = "Memory"; }
             if (section === void 0) { section = ""; }
+            if (quantaRun === void 0) { quantaRun = 0; }
             this.PID = PID;
             this.PC = PC;
             this.IR = IR;
@@ -38,6 +40,7 @@ var TSOS;
             this.state = state;
             this.location = location;
             this.section = section;
+            this.quantaRun = quantaRun;
         }
         return PCB;
     }());

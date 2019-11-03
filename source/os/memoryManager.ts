@@ -62,10 +62,31 @@ module TSOS {
             }
         }
 
-        public schedulingDecision() {
-            // Make a PCB the current PCB based on what is running or waiting
-            // Also account for a process ending and there being no more processes to be run
+        public getPCBByPID(givenPID: number) {
+            for (var PCB of _PCBList) {
+                if (PCB.PID == givenPID){
+                    return PCB;
+                }
+            }
         }
+
+        public PCBisResident(givenPID: number) {
+            for (var PCB of _PCBList) {
+                if (PCB.PID == givenPID){
+                    return true;
+                }
+            }
+        }
+
+        public getIndexByPID(list: TSOS.PCB[], givenPID: number) {
+            for (var i = 0; i < list.length; i++) {
+                if (list[i].PID == givenPID) {
+                    return i;
+                }
+            }
+
+        }
+
 
     }
 

@@ -39,6 +39,7 @@ var TSOS;
             this.isExecuting = false;
         };
         Cpu.prototype.cycle = function () {
+            var isCompleted = false;
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
@@ -78,8 +79,8 @@ var TSOS;
                         break; //load Yreg from memory
                     case "EA": break; //no operation (we increment PC after the switch statement, so we don't get stuck here)
                     case "00":
-                        this.breakProcess();
-                        break; //break
+                        isCompleted = true;
+                        break; //break function (the process is completed)
                     case "EC":
                         this.compareMemToXreg();
                         break; //compare byte in memory to Xreg, set Zflag to one if equal
@@ -109,10 +110,11 @@ var TSOS;
             this.IR = _MemoryAccessor.readMemoryToHex(_CurrentPCB.section, this.PC);
             // Copy the CPU to the CurrentPCB
             this.updatePCBWithCPU();
-            // Copy Current PCB to the _PCBList
-            this.updatePCBList();
             // Update the GUI again
             TSOS.Control.updateAllTables();
+            if (isCompleted) {
+                this.breakProcess();
+            }
         };
         Cpu.prototype.updateCPUWithPCB = function () {
             this.PC = _CurrentPCB.PC;
@@ -129,9 +131,6 @@ var TSOS;
             _CurrentPCB.Xreg = this.Xreg;
             _CurrentPCB.Yreg = this.Yreg;
             _CurrentPCB.Zflag = this.Zflag;
-        };
-        Cpu.prototype.updatePCBList = function () {
-            _PCBList[_CurrentPCB.PID] = _CurrentPCB;
         };
         //Op code functionality
         Cpu.prototype.loadAccConstant = function () {
@@ -185,14 +184,22 @@ var TSOS;
             this.PC++;
         };
         Cpu.prototype.breakProcess = function () {
-            // stops the program from running
-            _CPU.isExecuting = false;
-            _CurrentPCB.state = "Complete";
+            // the program is completed...
             // I don't know if  I shouldn't be doing this OS stuff in the cpu. May need to change for better host/OS separation
             _StdOut.advanceLine();
             _StdOut.putText("Process " + _CurrentPCB.PID + " Complete!");
             _StdOut.advanceLine();
             _OsShell.putPrompt();
+            // clear that section in memory
+            // _MemoryManager.clearSection(_CurrentPCB.section);
+            // remove PCB from _ReadyPCBList and _PCBList
+            _ReadyPCBList.splice(_MemoryManager.getIndexByPID(_ReadyPCBList, _CurrentPCB.PID), 1); // the two parameters are the index and the number of PCBs removed
+            _PCBList.splice(_MemoryManager.getIndexByPID(_PCBList, _CurrentPCB.PID), 1);
+            // remove PCB from _CurrentPCB
+            _CurrentPCB = null;
+            TSOS.Control.updateAllTables();
+            TSOS.Control.CPUTableClear();
+            _Scheduler.makeDecision();
         };
         Cpu.prototype.compareMemToXreg = function () {
             this.PC++;

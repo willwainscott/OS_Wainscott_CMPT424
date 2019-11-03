@@ -21,6 +21,7 @@ const TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (inte
 const KEYBOARD_IRQ: number = 1;
 const SYSTEM_CALL_IRQ: number = 2;
 const PROCESS_BREAK_IRQ: number = 3;
+const CONTEXT_SWITCH_IRQ: number = 4;
 
 
 //
@@ -32,7 +33,8 @@ var _Memory: TSOS.Memory;
 var _MemoryAccessor: TSOS.MemoryAccessor;
 
 var _MemoryManager: any = null;
-var _RRQuantum: number = 6; // Default Round Robin Scheduling Quantum
+var _Scheduler: any = null;
+var _RRQuantum: number = 6;     // Default Round Robin Scheduling Quantum
 
 var _PCBList: TSOS.PCB[] = [];
 var _CurrentPCB: TSOS.PCB = null;

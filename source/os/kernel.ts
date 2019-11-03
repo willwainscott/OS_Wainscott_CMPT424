@@ -39,6 +39,7 @@ module TSOS {
             _MemoryManager = new MemoryManager();
 
             // Make a new Scheduler W TODO
+            _Scheduler = new Scheduler();
 
             //
             // ... more?
@@ -146,6 +147,9 @@ module TSOS {
                     _StdOut.advanceLine();
                     _OsShell.putPrompt();
                     // _Scheduler.makeDecision();
+                    break;
+                case CONTEXT_SWITCH_IRQ:            // Changing the process that the CPU is running
+                    _CurrentPCB = params[0];
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
