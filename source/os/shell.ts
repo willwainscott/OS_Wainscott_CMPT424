@@ -653,9 +653,25 @@ module TSOS {
             if ((args.length = 1) && !(isNaN(Number(args[0])))) { //Checks to see if the arg is there and is actually a number
                 var enteredPID = Number(args[0]);
                 // Check to make sure the process is a resident or is running
-                if (_MemoryManager.PCBisResident()) {
-                    var params = [enteredPID.toString(),"User entered kill command."];
-                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_BREAK_IRQ, params));
+                if (_MemoryManager.PCBisResident(enteredPID)) {
+                    _StdOut.putText("Process " + enteredPID + " terminated through user kill command.");
+                    // if it was the _CurrentPCB, remove it
+                    if (_CurrentPCB != null){
+                        if (_CurrentPCB.PID == enteredPID) {
+                            _CurrentPCB = null;
+                        }
+                    }
+                    // Clear that section in memory
+                    _MemoryManager.clearMemory(_MemoryManager.getPCBByPID(enteredPID).section);
+                    // remove it from the _PCBList(s)
+                    _PCBList.splice(_MemoryManager.getIndexByPID(_PCBList,enteredPID), 1);
+                    if (_MemoryManager.PCBisReady(enteredPID)){
+                        _ReadyPCBList.splice(_MemoryManager.getIndexByPID(_ReadyPCBList,enteredPID), 1);
+                    }
+                    // update GUI
+                    Control.updateAllTables();
+                    // and finally schedule something (if anything)
+                    _Scheduler.makeDecision();
                 } else {
                     _StdOut.putText("Ensure the entered PID number is valid.")
                 }
@@ -665,15 +681,18 @@ module TSOS {
         }
 
         public shellKillAll(args: string[]) {
-            var params = ["","User entered killall command"];
-            for (var i = 0; i < _PCBList.length; i++) {
-                // kill every process
-                _PCBList[i].state = "Terminated";
-                params[0] = _PCBList[i].PID.toString();
-                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_BREAK_IRQ, params));
-            }
             // Stop the CPU from executing, because all the processes have been killed
             _CPU.isExecuting = false;
+            _StdOut.putText("Processes ");
+            for (var i = 0; i < _PCBList.length; i++){
+                _StdOut.putText(_PCBList[i].PID + " ");
+            }
+            _StdOut.putText("terminated through user killall command.");
+            _CurrentPCB = null;
+            _PCBList = [];
+            _ReadyPCBList = [];
+            _MemoryManager.clearMemory("all");
+            Control.updateAllTables();
         }
 
         public shellQuantum(args: string[]) {

@@ -78,6 +78,14 @@ module TSOS {
             }
         }
 
+        public PCBisReady(givenPID: number) {
+            for (var PCB of _ReadyPCBList) {
+                if (PCB.PID == givenPID){
+                    return true;
+                }
+            }
+        }
+
         public getIndexByPID(list: TSOS.PCB[], givenPID: number) {
             for (var i = 0; i < list.length; i++) {
                 if (list[i].PID == givenPID) {

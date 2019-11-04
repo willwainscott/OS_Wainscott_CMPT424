@@ -30,13 +30,13 @@ var TSOS;
             // we read the two bytes by reading the second code first
             hex = _Memory.memoryArray[_Memory.getBaseBySection(section) + PC + 1];
             hex += _Memory.memoryArray[_Memory.getBaseBySection(section) + PC];
-            var index = TSOS.Utils.hexStringToDecimal(hex);
+            var index = TSOS.Utils.hexStringToDecimal(hex) + _Memory.getBaseBySection(section);
             if (index > _Memory.getLimitBySection(section)) {
                 console.log("Memory out of bounds error");
                 throw (Error);
             }
             else {
-                return (TSOS.Utils.hexStringToDecimal(hex) + _Memory.getBaseBySection(section));
+                return index;
             }
         };
         MemoryAccessor.prototype.readMemoryToHex = function (section, PC) {

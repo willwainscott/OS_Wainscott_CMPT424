@@ -43,12 +43,12 @@ module TSOS {
             hex = _Memory.memoryArray[_Memory.getBaseBySection(section) + PC + 1];
             hex += _Memory.memoryArray[_Memory.getBaseBySection(section) + PC];
 
-            var index = Utils.hexStringToDecimal(hex);
+            var index = Utils.hexStringToDecimal(hex) + _Memory.getBaseBySection(section);
             if (index > _Memory.getLimitBySection(section)) {
                 console.log("Memory out of bounds error");
                 throw (Error);
             } else {
-                return (Utils.hexStringToDecimal(hex) + _Memory.getBaseBySection(section));
+                return index;
             }
         }
 

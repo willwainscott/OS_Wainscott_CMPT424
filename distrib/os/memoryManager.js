@@ -80,6 +80,14 @@ var TSOS;
                 }
             }
         };
+        MemoryManager.prototype.PCBisReady = function (givenPID) {
+            for (var _i = 0, _ReadyPCBList_1 = _ReadyPCBList; _i < _ReadyPCBList_1.length; _i++) {
+                var PCB = _ReadyPCBList_1[_i];
+                if (PCB.PID == givenPID) {
+                    return true;
+                }
+            }
+        };
         MemoryManager.prototype.getIndexByPID = function (list, givenPID) {
             for (var i = 0; i < list.length; i++) {
                 if (list[i].PID == givenPID) {
