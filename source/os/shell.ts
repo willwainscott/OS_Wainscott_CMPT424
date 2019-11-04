@@ -611,16 +611,17 @@ module TSOS {
         }
 
         public shellRunAll(args: string[]) {
+            _GoNextStep = false;
             for (var i = 0; i < _PCBList.length; i++) {
-                // If the process is loaded ...
+                // if the process is resident (and not running or waiting) ...
                 if (_PCBList[i].state = "Resident") {
-                    // ... Make it in the queue to be run ...
+                    // Make the process Waiting
                     _PCBList[i].state = "Waiting";
-                    // Make scheduling decision
-                    _Scheduler.makeDecision();
-
+                    // Add it to the ready queue
+                    _ReadyPCBList[_ReadyPCBList.length] = _PCBList[i];
                 }
             }
+            _Scheduler.makeDecision();
         }
 
         public shellClearMem(args: string[]) {
@@ -628,15 +629,22 @@ module TSOS {
             if (_CPU.isExecuting) {
                 _StdOut.putText("Memory can only be cleared when programs are not running.");
             } else {
+                // clear the PCB lists
+                _PCBList = [];
+                _ReadyPCBList = [];
                 _MemoryManager.clearMemory("all");
             }
         }
 
         public shellPS(args: string[]) {
             // Prints out the PID and state for each PCB
-            for (var i = 0; i < _PCBList.length; i++){
-                _StdOut.putText("Process ID: " + _PCBList[i].PID + " State: " + _PCBList[i].state);
-                _StdOut.advanceLine();
+            if (_PCBList.length > 0) {
+                for (var i = 0; i < _PCBList.length; i++){
+                    _StdOut.putText("Process ID: " + _PCBList[i].PID + " State: " + _PCBList[i].state);
+                    _StdOut.advanceLine();
+                }
+            } else {
+                _StdOut.putText("There are no loaded processes.");
             }
         }
 
@@ -644,12 +652,10 @@ module TSOS {
             // Check to see if the entered PID is valid
             if ((args.length = 1) && !(isNaN(Number(args[0])))) { //Checks to see if the arg is there and is actually a number
                 var enteredPID = Number(args[0]);
-                // Check to make sure the process is running or waiting
-                if ((_PCBList[enteredPID].state = "Running") || (_PCBList[enteredPID].state = "Waiting")) {
-                    // ... Terminate the process ...
-                    _PCBList[enteredPID].state = "Terminated";
-                    // ... If it was the current process, make scheduling decision ...
-                    _Scheduler.makeDecision();
+                // Check to make sure the process is a resident or is running
+                if (_MemoryManager.PCBisResident()) {
+                    var params = [enteredPID.toString(),"User entered kill command."];
+                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_BREAK_IRQ, params));
                 } else {
                     _StdOut.putText("Ensure the entered PID number is valid.")
                 }
@@ -659,12 +665,12 @@ module TSOS {
         }
 
         public shellKillAll(args: string[]) {
+            var params = ["","User entered killall command"];
             for (var i = 0; i < _PCBList.length; i++) {
-                // If the process os running or waiting ...
-                if ((_PCBList[i].state = "Running") || (_PCBList[i].state = "Waiting")) {
-                    // ... Terminate it
-                    _PCBList[i].state = "Terminated";
-                }
+                // kill every process
+                _PCBList[i].state = "Terminated";
+                params[0] = _PCBList[i].PID.toString();
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_BREAK_IRQ, params));
             }
             // Stop the CPU from executing, because all the processes have been killed
             _CPU.isExecuting = false;

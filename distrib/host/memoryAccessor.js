@@ -36,7 +36,7 @@ var TSOS;
                 throw (Error);
             }
             else {
-                return TSOS.Utils.hexStringToDecimal(hex);
+                return (TSOS.Utils.hexStringToDecimal(hex) + _Memory.getBaseBySection(section));
             }
         };
         MemoryAccessor.prototype.readMemoryToHex = function (section, PC) {

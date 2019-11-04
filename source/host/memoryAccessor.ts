@@ -48,7 +48,7 @@ module TSOS {
                 console.log("Memory out of bounds error");
                 throw (Error);
             } else {
-                return Utils.hexStringToDecimal(hex);
+                return (Utils.hexStringToDecimal(hex) + _Memory.getBaseBySection(section));
             }
         }
 

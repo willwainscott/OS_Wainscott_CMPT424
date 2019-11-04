@@ -96,16 +96,17 @@ var TSOS;
                     default:
                         // There was an invalid op code
                         console.log("Invalid Op Code");
-                        var params = ['Running Process Invalid Op Code'];
+                        var params = [_CurrentPCB.PID.toString(), 'Running Process Invalid Op Code'];
                         _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_BREAK_IRQ, params));
                 }
             }
             catch (Error) {
-                var params = ['Running Process Memory Access Violation'];
+                var params = [_CurrentPCB.PID.toString(), 'Running Process Memory Access Violation'];
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_BREAK_IRQ, params));
             }
             // Increment the PC so we know to go on the next command the next cpu cycle for this process
             this.PC++;
+            _CurrentPCB.quantaRun++;
             // Update the IR
             this.IR = _MemoryAccessor.readMemoryToHex(_CurrentPCB.section, this.PC);
             // Copy the CPU to the CurrentPCB
@@ -191,7 +192,7 @@ var TSOS;
             _StdOut.advanceLine();
             _OsShell.putPrompt();
             // clear that section in memory
-            // _MemoryManager.clearSection(_CurrentPCB.section);
+            _MemoryManager.clearMemory(_CurrentPCB.section);
             // remove PCB from _ReadyPCBList and _PCBList
             _ReadyPCBList.splice(_MemoryManager.getIndexByPID(_ReadyPCBList, _CurrentPCB.PID), 1); // the two parameters are the index and the number of PCBs removed
             _PCBList.splice(_MemoryManager.getIndexByPID(_PCBList, _CurrentPCB.PID), 1);
@@ -245,7 +246,7 @@ var TSOS;
                 console.log("System call print string");
                 // Print out the 00 terminated string stored at the address in the Y register
                 // This means the letters associated with the code in memory
-                var location = this.Yreg;
+                var location = this.Yreg + _Memory.getBaseBySection(_CurrentPCB.section);
                 var output = "";
                 var byteString;
                 for (var i = 0; i + location < _Memory.memoryArray.length; i++) {

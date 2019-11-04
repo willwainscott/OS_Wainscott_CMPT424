@@ -47,8 +47,10 @@ var TSOS;
             var chr = "";
             // Check to see if we even want to deal with the key that was pressed.
             if (keyCode == 67 && isControlled) { // Ctrl - C
-                var interruptParams = ['Ctrl-C'];
-                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_BREAK_IRQ, interruptParams));
+                if (_ReadyPCBList.length > 0) {
+                    var interruptParams = [_CurrentPCB.PID.toString(), 'Ctrl-C'];
+                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_BREAK_IRQ, interruptParams));
+                }
             }
             else if ((keyCode >= 65) && (keyCode <= 90)) { // letter
                 if (isShifted === true) {
