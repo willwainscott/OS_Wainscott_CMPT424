@@ -10,7 +10,7 @@ module TSOS {
 
     export class PCB {
 
-        constructor(public PID: number        = _PCBList.length,  // Process ID
+        constructor(public PID: number        = 0,                // Process ID
                     public PC: number         = 0,                //Process Counter
                     public IR: string         = "",               //IR? Specific op code that is being run
                     public ACC: number        = 0,                //Accumulator
@@ -19,7 +19,8 @@ module TSOS {
                     public Zflag: number      = 0,                //Z Flag
                     public state: string      = "Resident",       //State of the process
                     public location: string   = "Memory",         //Location (in memory/on the disk)
-                    public section: string    = "") {             //The section of memory it is in (or on the hard drive)
+                    public section: string    = "",               //The section of memory it is in (or on the hard drive)
+                    public quantaRun: number  = 0 ) {             //The number of times the process is run relative to the quanta in Round Robin
         }
 
     }

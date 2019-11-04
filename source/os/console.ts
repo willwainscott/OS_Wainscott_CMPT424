@@ -220,6 +220,8 @@ module TSOS {
             _DrawingContext.fillStyle = 'red';
             _DrawingContext.fillRect(0, 0, 500, 500); // Hard coding is not the best, but is DOM stuff in the OS any better?
             // _DrawingContext.fillRect(0, 0, document.getElementById("display").width, document.getElementById("display").height);
+            // ... set the prompt to nothing so it doesn't print out
+            _OsShell.promptStr = "";
             //reset Y position so you can see...
             this.currentYPosition = 100; // Just a random number, no real significance
             // ... some flavorful text!

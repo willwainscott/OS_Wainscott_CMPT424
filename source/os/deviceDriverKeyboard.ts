@@ -36,8 +36,10 @@ module TSOS {
             var chr = "";
             // Check to see if we even want to deal with the key that was pressed.
             if (keyCode == 67 && isControlled) {            // Ctrl - C
-                chr = "ctrl-C";
-                _KernelInputQueue.enqueue(chr);
+                if (_ReadyPCBList.length > 0) {
+                    var interruptParams: string[] = [_CurrentPCB.PID.toString(), 'Ctrl-C'];
+                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_BREAK_IRQ, interruptParams));
+                }
             } else if ((keyCode >= 65) && (keyCode <= 90)) { // letter
                 if (isShifted === true) { 
                     chr = String.fromCharCode(keyCode); // Uppercase A-Z

@@ -4,7 +4,14 @@ module TSOS {
 
     export class Memory {
 
-        public memoryArray: string[] = new Array(256);
+        public memoryArray: string[] = new Array(768);
+
+        private sectionOneBase     = 0;
+        private sectionOneLimit    = 255;
+        private sectionTwoBase     = 256;
+        private sectionTwoLimit    = 511;
+        private sectionThreeBase   = 512;
+        private sectionThreeLimit  = 767;
 
         constructor(){
         }
@@ -16,7 +23,44 @@ module TSOS {
             }
         }
 
+        public getBaseBySection(section: string) {
+            switch (section) {
+                case "1":
+                    return this.sectionOneBase;
+                    break;
+                case "2":
+                    return this.sectionTwoBase;
+                    break;
+                case "3":
+                    return this.sectionThreeBase;
+                    break;
+                case "all":
+                    return this.sectionOneBase;
+                    break;
+                default:
+                    console.log("Invalid section number when calling Memory.getBaseBySection()");
+            }
+        }
 
+        public getLimitBySection(section: string) {
+            switch (section) {
+                case "1":
+                    return this.sectionOneLimit;
+                    break;
+                case "2":
+                    return this.sectionTwoLimit;
+                    break;
+                case "3":
+                    return this.sectionThreeLimit;
+                    break;
+                case "all":
+                    return this.sectionThreeLimit;
+                    break;
+                default:
+                    console.log(section);
+                    console.log("Invalid section number when calling Memory.getLimitBySection()");
+            }
+        }
 
 
 

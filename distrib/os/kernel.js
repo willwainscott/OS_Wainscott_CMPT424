@@ -33,6 +33,8 @@ var TSOS;
             this.krnTrace(_krnKeyboardDriver.status);
             // Make a new Memory Manager
             _MemoryManager = new TSOS.MemoryManager();
+            // Make a new Scheduler W TODO
+            _Scheduler = new TSOS.Scheduler();
             //
             // ... more?
             //
@@ -77,6 +79,7 @@ var TSOS;
                 if (_CPU.isExecuting && _GoNextStep) {
                     _CPU.cycle();
                     _GoNextStep = false;
+                    _Scheduler.makeDecision();
                 }
                 else {
                     this.krnTrace("Idle");
@@ -84,6 +87,7 @@ var TSOS;
             }
             else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed.
                 _CPU.cycle();
+                _Scheduler.makeDecision();
             }
             else { // If there are no interrupts and there is nothing being executed then just be idle.
                 this.krnTrace("Idle");
@@ -120,6 +124,28 @@ var TSOS;
                     break;
                 case SYSTEM_CALL_IRQ: // User code system call
                     _StdOut.putText(params[0]);
+                    break;
+                case PROCESS_BREAK_IRQ: // Ctrl-C, or Other Error causing process to stop and be killed
+                    if (_CurrentPCB != null) {
+                        _CurrentPCB.state = "Terminated";
+                        _StdOut.advanceLine();
+                        _StdOut.putText("Process " + params[0] + " Terminated due to: " + params[1]);
+                        _StdOut.advanceLine();
+                        _OsShell.putPrompt();
+                        // clear that section in memory
+                        _MemoryManager.clearMemory(_CurrentPCB.section);
+                        // remove PCB from _ReadyPCBList and _PCBList
+                        _ReadyPCBList.splice(_MemoryManager.getIndexByPID(_ReadyPCBList, _CurrentPCB.PID), 1);
+                        _PCBList.splice(_MemoryManager.getIndexByPID(_PCBList, _CurrentPCB.PID), 1);
+                        // remove PCB from _CurrentPCB
+                        _CurrentPCB = null;
+                        TSOS.Control.updateAllTables();
+                        TSOS.Control.CPUTableClear();
+                        _Scheduler.makeDecision();
+                        break;
+                    }
+                case CONTEXT_SWITCH_IRQ: // Changing the process that the CPU is running
+                    _CurrentPCB = params[0];
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

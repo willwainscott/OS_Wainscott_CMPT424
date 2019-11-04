@@ -36,6 +36,8 @@ module TSOS {
         }
 
         public cycle(): void {
+            var isCompleted = false;
+
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
@@ -52,30 +54,35 @@ module TSOS {
 
 
             // Run the next code
-
-            switch (_CurrentPCB.IR) {
-                case "A9": this.loadAccConstant();          break;  //load accumulator with a constant
-                case "AD": this.loadAccMemory();            break;  //load accumulator from memory
-                case "8D": this.storeAcc();                 break;  //store accumulator in memory
-                case "6D": this.addWithCarry();             break;  //add contents of memory to accumulator and store in accumulator
-                case "A2": this.loadXregFromConstant();     break;  //load Xreg with a constant
-                case "AE": this.loadXregFromMemory();       break;  //load Xreg from memory
-                case "A0": this.loadYregFromConstant();     break;  //load Yreg with a constant
-                case "AC": this.loadYregFromMemory();       break;  //load Yreg from memory
-                case "EA":                                  break;  //no operation (we increment PC after the switch statement, so we don't get stuck here)
-                case "00": this.breakProcess();             break;  //break
-                case "EC": this.compareMemToXreg();         break;  //compare byte in memory to Xreg, set Zflag to one if equal
-                case "D0": this.branchBytes();              break;  //branch a given amount of bytes if Zflag is zero
-                case "EE": this.incrementByte();            break;  //increment the value of a byte
-                case "FF": this.systemCall();               break;  //system call (used for printing stuff)
-                default:
-                    // There was an invalid op code
-                    console.log("Invalid Op Code");
-                    // probably write some sort of notice to the user that something is broken
+            try {
+                switch (_CurrentPCB.IR) {
+                    case "A9": this.loadAccConstant();          break;  //load accumulator with a constant
+                    case "AD": this.loadAccMemory();            break;  //load accumulator from memory
+                    case "8D": this.storeAcc();                 break;  //store accumulator in memory
+                    case "6D": this.addWithCarry();             break;  //add contents of memory to accumulator and store in accumulator
+                    case "A2": this.loadXregFromConstant();     break;  //load Xreg with a constant
+                    case "AE": this.loadXregFromMemory();       break;  //load Xreg from memory
+                    case "A0": this.loadYregFromConstant();     break;  //load Yreg with a constant
+                    case "AC": this.loadYregFromMemory();       break;  //load Yreg from memory
+                    case "EA":                                  break;  //no operation (we increment PC after the switch statement, so we don't get stuck here)
+                    case "00": isCompleted = true;              break;  //break function (the process is completed)
+                    case "EC": this.compareMemToXreg();         break;  //compare byte in memory to Xreg, set Zflag to one if equal
+                    case "D0": this.branchBytes();              break;  //branch a given amount of bytes if Zflag is zero
+                    case "EE": this.incrementByte();            break;  //increment the value of a byte
+                    case "FF": this.systemCall();               break;  //system call (used for printing stuff)
+                    default:
+                        // There was an invalid op code
+                        console.log("Invalid Op Code");
+                        var params: string[] = [_CurrentPCB.PID.toString(), 'Running Process Invalid Op Code'];
+                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_BREAK_IRQ, params));
+                }
+            } catch (Error) {
+                var params: string[] = [_CurrentPCB.PID.toString(), 'Running Process Memory Access Violation'];
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_BREAK_IRQ, params));
             }
-
             // Increment the PC so we know to go on the next command the next cpu cycle for this process
             this.PC++;
+            _CurrentPCB.quantaRun++;
 
             // Update the IR
             this.IR = _MemoryAccessor.readMemoryToHex(_CurrentPCB.section, this.PC);
@@ -83,11 +90,12 @@ module TSOS {
             // Copy the CPU to the CurrentPCB
             this.updatePCBWithCPU();
 
-            // Copy Current PCB to the _PCBList
-            this.updatePCBList();
-
             // Update the GUI again
             Control.updateAllTables();
+
+            if (isCompleted) {
+                this.breakProcess();
+            }
 
         }
 
@@ -108,9 +116,6 @@ module TSOS {
             _CurrentPCB.Yreg = this.Yreg;
             _CurrentPCB.Zflag = this.Zflag;
 
-        }
-        public updatePCBList() {
-            _PCBList[_CurrentPCB.PID] = _CurrentPCB;
         }
 
         //Op code functionality
@@ -175,14 +180,22 @@ module TSOS {
         }
 
         public breakProcess() {
-            // stops the program from running
-            _CPU.isExecuting = false;
-            _CurrentPCB.state = "Complete";
+            // the program is completed...
             // I don't know if  I shouldn't be doing this OS stuff in the cpu. May need to change for better host/OS separation
             _StdOut.advanceLine();
             _StdOut.putText("Process " + _CurrentPCB.PID + " Complete!");
             _StdOut.advanceLine();
             _OsShell.putPrompt();
+            // clear that section in memory
+            _MemoryManager.clearMemory(_CurrentPCB.section);
+            // remove PCB from _ReadyPCBList and _PCBList
+            _ReadyPCBList.splice(_MemoryManager.getIndexByPID(_ReadyPCBList,_CurrentPCB.PID), 1); // the two parameters are the index and the number of PCBs removed
+            _PCBList.splice(_MemoryManager.getIndexByPID(_PCBList,_CurrentPCB.PID), 1);
+            // remove PCB from _CurrentPCB
+            _CurrentPCB = null;
+            Control.updateAllTables();
+            Control.CPUTableClear();
+            _Scheduler.makeDecision();
         }
 
         public compareMemToXreg() {
@@ -229,7 +242,7 @@ module TSOS {
                 console.log("System call print string")
                 // Print out the 00 terminated string stored at the address in the Y register
                 // This means the letters associated with the code in memory
-                var location = this.Yreg;
+                var location = this.Yreg + _Memory.getBaseBySection(_CurrentPCB.section);
                 var output: string = "";
                 var byteString: string;
                 for (var i = 0; i + location < _Memory.memoryArray.length; i++) {
