@@ -20,6 +20,7 @@ module TSOS {
             for (var i = firstIndex; i <= lastIndex; i++) {
                 _Memory.memoryArray[i] = "00";
             }
+            Control.updateAllTables();
         }
 
         public loadMemory(userInput,section) {  //Start index may change to the start of the section of the memory

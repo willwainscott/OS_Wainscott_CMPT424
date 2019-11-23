@@ -17,6 +17,7 @@ var TSOS;
             for (var i = firstIndex; i <= lastIndex; i++) {
                 _Memory.memoryArray[i] = "00";
             }
+            TSOS.Control.updateAllTables();
         };
         MemoryManager.prototype.loadMemory = function (userInput, section) {
             // make array of the entered commands
