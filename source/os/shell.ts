@@ -152,6 +152,18 @@ module TSOS {
                                   "- Changes the round robin quantum.");
             this.commandList[this.commandList.length] = sc;
 
+            //setschedule
+            sc = new ShellCommand(this.shellSetSchedule,
+                                  "setschedule",
+                                  "<rr|fcfs|priority> - Changes the current scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+
+            //getschedule
+            sc = new ShellCommand(this.shellGetSchedule,
+                                  "getschedule",
+                                  "- Returns the current scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -384,6 +396,12 @@ module TSOS {
                         break;
                     case "quantum":
                         _StdOut.putText("Changes the round robin quantum for process scheduling.");
+                        break;
+                    case "setschedule":
+                        _StdOut.putText("Changes the current scheduling algorithm to Round Robin, First Come First Serve, or Priority.");
+                        break;
+                    case "getschedule":
+                        _StdOut.putText("Returns the current scheduling algorithm.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -702,6 +720,32 @@ module TSOS {
             } else {
                 _StdOut.putText("Please enter a valid quantum");
             }
+        }
+
+        public shellSetSchedule(args: string[]) {
+            var enteredAlgorithm = args[0];
+            switch (enteredAlgorithm) {
+                case "rr":
+                    _SchedulingAlgorithm = "Round Robin";
+                    _StdOut.putText("Scheduling Algorithm set to Round Robin.");
+                    break;
+                case "fcfs":
+                    _SchedulingAlgorithm = "First Come First Serve";
+                    _StdOut.putText("Scheduling Algorithm set to First Come First Serve.");
+                    break;
+                case "priority":
+                    _SchedulingAlgorithm = "Priority";
+                    _StdOut.putText("Scheduling Algorithm set to Priority.");
+                    break;
+                default:
+                    _StdOut.putText("Please enter a valid Scheduling Algorithm.");
+            }
+        }
+
+        public shellGetSchedule(args: string[]) {
+
+            _StdOut.putText("The current Scheduling Algorithm is " + _SchedulingAlgorithm + ".");
+
         }
     }
 }
