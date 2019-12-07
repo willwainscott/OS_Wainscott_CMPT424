@@ -39,6 +39,23 @@ var TSOS;
                 }
             }
             else if (_SchedulingAlgorithm == "Priority") {
+                if (_ReadyPCBList.length > 0) {
+                    if ((_ReadyPCBList.length == 1) && (_CurrentPCB == null)) {
+                        // If there's only one ready process and its not running...
+                        // Make that one process the running one
+                        var params = [_ReadyPCBList[0]];
+                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, params));
+                    }
+                    else if ((_ReadyPCBList.length >= 2) && (_CurrentPCB == null)) {
+                        // There are two or more ready processes but none currently running (or if one just finished)
+                        this.findNextProcessPR();
+                    }
+                    _CPU.isExecuting = true;
+                }
+                else {
+                    // There is nothing in _ReadyPCBList
+                    _CPU.isExecuting = false;
+                }
             }
         };
         Scheduler.prototype.findNextProcessRR = function () {
@@ -61,6 +78,18 @@ var TSOS;
                 }
                 // run the first one in the ready queue
                 var params = [_ReadyPCBList[0]];
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, params));
+            }
+        };
+        Scheduler.prototype.findNextProcessPR = function () {
+            var tempPCB = _ReadyPCBList[0];
+            for (var i = 1; i < _ReadyPCBList.length; i++) {
+                //compare priority to find the highest (well technically lowest numerical) one
+                if (tempPCB.priority > _ReadyPCBList[i].priority) { //lower number means higher priority
+                    tempPCB = _ReadyPCBList[i];
+                }
+                // context switch to the next process
+                var params = [tempPCB];
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, params));
             }
         };

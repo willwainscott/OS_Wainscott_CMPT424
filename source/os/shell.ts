@@ -513,11 +513,11 @@ module TSOS {
             var priority = 10;
             // Check for user entered priority
             if (args.length > 0) {        // If the arguments is longer than 1 (there is something after the 'load' command)...
-                if (args.length == 1 && !(isNaN(Number(args[1])))) {  // If only one number is entered and its a number ...
-                    if (parseInt(args[1]) < 99 && parseInt(args[1]) > 0) {
-                        priority = parseInt(args[1]);
+                if (args.length == 1 && !(isNaN(Number(args[0])))) {  // If only one number is entered and its a number ...
+                    if (parseInt(args[0]) < 100 && parseInt(args[0]) > 0) {
+                        priority = parseInt(args[0]);
                     } else {
-                        _StdOut.putText("Please enter a priority greater than 0 and less than 99.");
+                        _StdOut.putText("Please enter a priority greater than 0 and less than 100.");
                         return;
                     }
                 } else {
