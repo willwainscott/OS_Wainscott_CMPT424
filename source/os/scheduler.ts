@@ -14,32 +14,35 @@ module TSOS {
 
         // The function that decided which process gets run
         public makeDecision() {
-
-            if (_ReadyPCBList.length > 0) {
-                if ((_ReadyPCBList.length == 1) && (_CurrentPCB == null)) {
-                    // If there's only one ready process and its not running...
-                    // Make that one process the running one
-                    var params = [_ReadyPCBList[0]];
-                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, params));
-                } else if ((_ReadyPCBList.length >= 2) && (_CurrentPCB == null)) {
-                    // There are two or more ready processes but none currently running
-                    this.findNextProcess();
-                } else if (_ReadyPCBList.length >= 2) {
-                    // if the current PCB's quantum is up ...
-                    if (!(_CurrentPCB.quantaRun < _RRQuantum)) {
-                        _CurrentPCB.state = "Waiting";
-                        this.findNextProcess();
+            if (_SchedulingAlgorithm == "Round Robin" || _SchedulingAlgorithm == "First Come First Serve") {
+                if (_ReadyPCBList.length > 0) {
+                    if ((_ReadyPCBList.length == 1) && (_CurrentPCB == null)) {
+                        // If there's only one ready process and its not running...
+                        // Make that one process the running one
+                        var params = [_ReadyPCBList[0]];
+                        _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, params));
+                    } else if ((_ReadyPCBList.length >= 2) && (_CurrentPCB == null)) {
+                        // There are two or more ready processes but none currently running
+                        this.findNextProcessRR();
+                    } else if (_ReadyPCBList.length >= 2) {
+                        // if the current PCB's quantum is up ...
+                        if (!(_CurrentPCB.quantaRun < _RRQuantum)) {
+                            _CurrentPCB.state = "Waiting";
+                            this.findNextProcessRR();
+                        }
                     }
+                    _CPU.isExecuting = true;
+                } else {
+                    // There is nothing in _ReadyPCBList
+                    _CPU.isExecuting = false;
                 }
-                _CPU.isExecuting = true;
-            } else {
-                // There is nothing in _ReadyPCBList
-                _CPU.isExecuting = false;
+            } else if (_SchedulingAlgorithm == "Priority") {
+
             }
 
         }
 
-        public findNextProcess() {
+        public findNextProcessRR() {
             var nextFound = false;
             for (var i = 0; i < _ReadyPCBList.length; i++) {
                 // check the quantum of each process to find next one to run

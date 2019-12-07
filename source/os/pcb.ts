@@ -20,7 +20,8 @@ module TSOS {
                     public state: string      = "Resident",       //State of the process
                     public location: string   = "Memory",         //Location (in memory/on the disk)
                     public section: string    = "",               //The section of memory it is in (or on the hard drive)
-                    public quantaRun: number  = 0 ) {             //The number of times the process is run relative to the quanta in Round Robin
+                    public quantaRun: number  = 0,                //The number of times the process is run relative to the quanta in Round Robin
+                    public priority: number   = 10) {             //The priority used for priority scheduling
         }
 
     }

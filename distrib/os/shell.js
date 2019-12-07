@@ -62,7 +62,7 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellError, "error", "- Simulates an OS error.");
             this.commandList[this.commandList.length] = sc;
             //load
-            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Loads entered user code.");
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "<priority> - Loads entered user code with an optional priority.");
             this.commandList[this.commandList.length] = sc;
             //run
             sc = new TSOS.ShellCommand(this.shellRun, "run", "<PID> - Runs a process based on a given Process ID.");
@@ -288,7 +288,7 @@ var TSOS;
                         _StdOut.putText("Simulates an OS error and violently dies.");
                         break;
                     case "load":
-                        _StdOut.putText("Loads user code entered in the text area into memory.");
+                        _StdOut.putText("Loads user code entered in the text area into memory. User can also add a priority for the process. Process priority defaulted to 10.");
                         break;
                     case "run":
                         _StdOut.putText("Runs a loaded program based on the Process ID.");
@@ -424,6 +424,23 @@ var TSOS;
             // remove and leading or trailing spaces
             userCode = TSOS.Utils.trim(userCode);
             var valid = true;
+            var priority = 10;
+            // Check for user entered priority
+            if (args.length > 0) { // If the arguments is longer than 1 (there is something after the 'load' command)...
+                if (args.length == 1 && !(isNaN(Number(args[1])))) { // If only one number is entered and its a number ...
+                    if (parseInt(args[1]) < 99 && parseInt(args[1]) > 0) {
+                        priority = parseInt(args[1]);
+                    }
+                    else {
+                        _StdOut.putText("Please enter a priority greater than 0 and less than 99.");
+                        return;
+                    }
+                }
+                else {
+                    _StdOut.putText("Please enter a valid number for a priority.");
+                    return;
+                }
+            }
             var charArray = userCode.split(''); //makes array of every char the user entered
             var stringArray = userCode.split(' '); // makes array of every space separated string
             for (var _i = 0, charArray_1 = charArray; _i < charArray_1.length; _i++) {
@@ -480,6 +497,8 @@ var TSOS;
                     // give it a PID
                     PCB.PID = _PIDCounter;
                     _PIDCounter++; // Increment to prevent duplicate PIDs
+                    // give it a priority
+                    PCB.priority = priority;
                     // Assign it a section in memory
                     PCB.section = _MemoryManager.assignMemorySection();
                     //Add it to global list of Resident PCBs
@@ -624,7 +643,12 @@ var TSOS;
         Shell.prototype.shellQuantum = function (args) {
             // Check to see if the entered Quantum is valid
             if ((args.length = 1) && !(isNaN(Number(args[0])))) { //Checks to see if the arg is there and is actually a number
-                _RRQuantum = parseInt(args[0]);
+                if (parseInt(args[0]) > 0) {
+                    _RRQuantum = parseInt(args[0]);
+                }
+                else {
+                    _StdOut.putText("Please enter a quantum greater than 0.");
+                }
             }
             else {
                 _StdOut.putText("Please enter a valid quantum");
@@ -634,16 +658,46 @@ var TSOS;
             var enteredAlgorithm = args[0];
             switch (enteredAlgorithm) {
                 case "rr":
-                    _SchedulingAlgorithm = "Round Robin";
-                    _StdOut.putText("Scheduling Algorithm set to Round Robin.");
+                    if (_SchedulingAlgorithm == "Round Robin") {
+                        _StdOut.putText("The current scheduling algorithm is already " + _SchedulingAlgorithm + ".");
+                        if (_SarcasticMode) { // some extra flavor so I can keep my sanity
+                            _StdOut.advanceLine();
+                            _StdOut.putText("Idiot.");
+                        }
+                    }
+                    else {
+                        _SchedulingAlgorithm = "Round Robin";
+                        _RRQuantum = _TempQuantum; //This is where the quantum before the change to fcfs was stored
+                        _StdOut.putText("Scheduling Algorithm set to Round Robin.");
+                    }
                     break;
                 case "fcfs":
-                    _SchedulingAlgorithm = "First Come First Serve";
-                    _StdOut.putText("Scheduling Algorithm set to First Come First Serve.");
+                    if (_SchedulingAlgorithm == "First Come First Serve") {
+                        _StdOut.putText("The current scheduling algorithm is already " + _SchedulingAlgorithm + ".");
+                        if (_SarcasticMode) {
+                            _StdOut.advanceLine();
+                            _StdOut.putText("Idiot.");
+                        }
+                    }
+                    else {
+                        _SchedulingAlgorithm = "First Come First Serve";
+                        _TempQuantum = _RRQuantum;
+                        _RRQuantum = Number.MAX_VALUE;
+                        _StdOut.putText("Scheduling Algorithm set to First Come First Serve.");
+                    }
                     break;
                 case "priority":
-                    _SchedulingAlgorithm = "Priority";
-                    _StdOut.putText("Scheduling Algorithm set to Priority.");
+                    if (_SchedulingAlgorithm == "Priority") {
+                        _StdOut.putText("The current scheduling algorithm is already " + _SchedulingAlgorithm + ".");
+                        if (_SarcasticMode) {
+                            _StdOut.advanceLine();
+                            _StdOut.putText("Idiot.");
+                        }
+                    }
+                    else {
+                        _SchedulingAlgorithm = "Priority";
+                        _StdOut.putText("Scheduling Algorithm set to Priority.");
+                    }
                     break;
                 default:
                     _StdOut.putText("Please enter a valid Scheduling Algorithm.");

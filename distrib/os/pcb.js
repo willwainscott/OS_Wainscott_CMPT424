@@ -18,7 +18,8 @@ var TSOS;
         state, //State of the process
         location, //Location (in memory/on the disk)
         section, //The section of memory it is in (or on the hard drive)
-        quantaRun) {
+        quantaRun, //The number of times the process is run relative to the quanta in Round Robin
+        priority) {
             if (PID === void 0) { PID = 0; }
             if (PC === void 0) { PC = 0; }
             if (IR === void 0) { IR = ""; }
@@ -30,6 +31,7 @@ var TSOS;
             if (location === void 0) { location = "Memory"; }
             if (section === void 0) { section = ""; }
             if (quantaRun === void 0) { quantaRun = 0; }
+            if (priority === void 0) { priority = 10; }
             this.PID = PID;
             this.PC = PC;
             this.IR = IR;
@@ -41,6 +43,7 @@ var TSOS;
             this.location = location;
             this.section = section;
             this.quantaRun = quantaRun;
+            this.priority = priority;
         }
         return PCB;
     }());

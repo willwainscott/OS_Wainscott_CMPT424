@@ -28,8 +28,9 @@ var _Memory;
 var _MemoryAccessor;
 var _MemoryManager = null;
 var _Scheduler = null;
-var _SchedulingAlgorithm = "RoundRobin"; // Scheduling algorithm, defaulted to RoundRobin
+var _SchedulingAlgorithm = "Round Robin"; // Scheduling algorithm, defaulted to RoundRobin
 var _RRQuantum = 6; // Default Round Robin Scheduling Quantum
+var _TempQuantum = null; // Used to store the quantum if the algorithm is changed to fcfs
 var _PCBList = [];
 var _CurrentPCB = null;
 var _ReadyPCBList = [];

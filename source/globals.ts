@@ -34,8 +34,9 @@ var _MemoryAccessor: TSOS.MemoryAccessor;
 
 var _MemoryManager: any = null;
 var _Scheduler: any = null;
-var _SchedulingAlgorithm: string = "RoundRobin"; // Scheduling algorithm, defaulted to RoundRobin
+var _SchedulingAlgorithm: string = "Round Robin"; // Scheduling algorithm, defaulted to RoundRobin
 var _RRQuantum: number = 6;     // Default Round Robin Scheduling Quantum
+var _TempQuantum: number = null; // Used to store the quantum if the algorithm is changed to fcfs
 
 var _PCBList: TSOS.PCB[] = [];
 var _CurrentPCB: TSOS.PCB = null;
