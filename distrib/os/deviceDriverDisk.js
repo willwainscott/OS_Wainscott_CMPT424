@@ -56,6 +56,7 @@ var TSOS;
                     }
                 }
             }
+            TSOS.Control.diskTableUpdate();
         };
         return DeviceDriverDisk;
     }(TSOS.DeviceDriver));

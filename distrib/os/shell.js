@@ -719,6 +719,7 @@ var TSOS;
             }
             else {
                 _krnDiskDriver.formatDisk();
+                _StdOut.putText("Disk Fomatted Successfully!");
             }
         };
         return Shell;

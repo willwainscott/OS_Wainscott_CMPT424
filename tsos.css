@@ -79,3 +79,6 @@ tr:nth-child(even) {
     background-color: lightgray;
 }
 
+.diskTable tr:first-child td {
+    font-weight: bold;
+}

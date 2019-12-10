@@ -28,7 +28,7 @@ module TSOS {
 
         public formatDisk() {
             // Create an empty block array
-            var emptyBlock: string[] = new Array(64);
+            var emptyBlock: String[] = new Array(64);
             for (var i = 0; i < emptyBlock.length; i++) {
                 if (i < 4) {
                     emptyBlock[i] = "0";
@@ -44,6 +44,7 @@ module TSOS {
                     }
                 }
             }
+            Control.diskTableUpdate();
 
         }
 
