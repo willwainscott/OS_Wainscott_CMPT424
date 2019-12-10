@@ -164,6 +164,12 @@ module TSOS {
                                   "- Returns the current scheduling algorithm.");
             this.commandList[this.commandList.length] = sc;
 
+            //format
+            sc = new ShellCommand(this.shellFormat,
+                                  "format",
+                                  "- Formats the disk to allow file storage and virtual memory.");
+            this.commandList[this.commandList.length] = sc;
+
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -402,6 +408,9 @@ module TSOS {
                         break;
                     case "getschedule":
                         _StdOut.putText("Returns the current scheduling algorithm.");
+                        break;
+                    case "format":
+                        _StdOut.putText("Formats the disk for file storage and virtual memory swapping.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -792,9 +801,17 @@ module TSOS {
         }
 
         public shellGetSchedule(args: string[]) {
-
             _StdOut.putText("The current Scheduling Algorithm is " + _SchedulingAlgorithm + ".");
+        }
 
+        public shellFormat(args: string[]) {
+            // check to see if the disk is formatted
+            if (_DiskFormatted) {
+                _StdOut.putText("Disk Already Formatted!");
+            } else {
+                _krnDiskDriver.formatDisk();
+                _StdOut.putText("Disk Fomatted Successfully!");
+            }
         }
     }
 }

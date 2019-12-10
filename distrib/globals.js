@@ -26,6 +26,8 @@ var CONTEXT_SWITCH_IRQ = 4;
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _Memory;
 var _MemoryAccessor;
+var _Disk;
+var _DiskFormatted = false;
 var _MemoryManager = null;
 var _Scheduler = null;
 var _SchedulingAlgorithm = "Round Robin"; // Scheduling algorithm, defaulted to RoundRobin
@@ -58,6 +60,7 @@ var _OsShell;
 var _SarcasticMode = false;
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver = null;
+var _krnDiskDriver = null;
 var _hardwareClockID = null;
 var _UserCodeTextArea; // Used to store user code entered into the text area
 var _SingleStep = false; // Based on whether or not the user wants to go step by step

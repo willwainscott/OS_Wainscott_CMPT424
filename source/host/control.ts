@@ -105,6 +105,10 @@ module TSOS {
             // ... throw an Accessor in there while you're at it so we can access our new memory ...
             _MemoryAccessor = new MemoryAccessor();
 
+            // ... Create and initialize our sweet disk ...
+            _Disk = new Disk();
+
+
 
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);

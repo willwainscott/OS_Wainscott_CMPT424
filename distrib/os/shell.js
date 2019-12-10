@@ -91,6 +91,9 @@ var TSOS;
             //getschedule
             sc = new TSOS.ShellCommand(this.shellGetSchedule, "getschedule", "- Returns the current scheduling algorithm.");
             this.commandList[this.commandList.length] = sc;
+            //format
+            sc = new TSOS.ShellCommand(this.shellFormat, "format", "- Formats the disk to allow file storage and virtual memory.");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         };
@@ -316,6 +319,9 @@ var TSOS;
                         break;
                     case "getschedule":
                         _StdOut.putText("Returns the current scheduling algorithm.");
+                        break;
+                    case "format":
+                        _StdOut.putText("Formats the disk for file storage and virtual memory swapping.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -705,6 +711,15 @@ var TSOS;
         };
         Shell.prototype.shellGetSchedule = function (args) {
             _StdOut.putText("The current Scheduling Algorithm is " + _SchedulingAlgorithm + ".");
+        };
+        Shell.prototype.shellFormat = function (args) {
+            // check to see if the disk is formatted
+            if (_DiskFormatted) {
+                _StdOut.putText("Disk Already Formatted!");
+            }
+            else {
+                _krnDiskDriver.formatDisk();
+            }
         };
         return Shell;
     }());
