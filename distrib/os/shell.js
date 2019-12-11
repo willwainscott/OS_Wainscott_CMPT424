@@ -94,6 +94,13 @@ var TSOS;
             //format
             sc = new TSOS.ShellCommand(this.shellFormat, "format", "- Formats the disk to allow file storage and virtual memory.");
             this.commandList[this.commandList.length] = sc;
+            //create
+            sc = new TSOS.ShellCommand(this.shellCreateFile, "create", "<filename> - Creates a file with an entered name.");
+            this.commandList[this.commandList.length] = sc;
+            //read
+            //write
+            //delete
+            //ls
             // Display the initial prompt.
             this.putPrompt();
         };
@@ -168,6 +175,8 @@ var TSOS;
                 case "rot13":
                     break;
                 case "prompt":
+                    break;
+                case "create":
                     break;
                 default:
                     buffer = buffer.toLowerCase();
@@ -322,6 +331,9 @@ var TSOS;
                         break;
                     case "format":
                         _StdOut.putText("Formats the disk for file storage and virtual memory swapping.");
+                        break;
+                    case "create":
+                        _StdOut.putText("Creates a file and stores it in the file system.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -715,11 +727,33 @@ var TSOS;
         Shell.prototype.shellFormat = function (args) {
             // check to see if the disk is formatted
             if (_DiskFormatted) {
-                _StdOut.putText("Disk Already Formatted!");
+                _StdOut.putText("Disk Already Formatted! Disk can only be formatted once!");
             }
             else {
                 _krnDiskDriver.formatDisk();
+                _DiskFormatted = true;
                 _StdOut.putText("Disk Fomatted Successfully!");
+            }
+        };
+        Shell.prototype.shellCreateFile = function (args) {
+            // check to make sure the disk is formatted
+            if (_DiskFormatted) {
+                // check to make sure they entered a filename
+                if (args.length == 1) {
+                    if (args[0].length < 60) {
+                        _krnDiskDriver.createFile(args[0]);
+                        _StdOut.putText("Successfully created file " + args[0]);
+                    }
+                    else {
+                        _StdOut.putText("File name too big! Only name 60 character or less are allowed.");
+                    }
+                }
+                else {
+                    _StdOut.putText("Please enter a valid filename.");
+                }
+            }
+            else {
+                _StdOut.putText("Please format the disk before creating files.");
             }
         };
         return Shell;

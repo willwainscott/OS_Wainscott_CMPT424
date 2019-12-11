@@ -248,7 +248,9 @@ var TSOS;
             }
         };
         Control.diskTableUpdate = function () {
-            //maybe clear the table??
+            // clear the table
+            this.diskTableClear();
+            // load the table
             var diskTable = document.getElementById("diskTable");
             var dataArray;
             var rowNumber = 1; // Used to keep track of the rows in the html table, starts at 1 to not overwrite the first row
@@ -296,6 +298,14 @@ var TSOS;
                 }
             }
         };
+        // Clear Disk Table
+        Control.diskTableClear = function () {
+            var diskTable = document.getElementById("diskTable");
+            // delete each row
+            for (var i = diskTable.rows.length; i > 1; i--) {
+                diskTable.deleteRow(i - 1);
+            }
+        };
         // Updates all GUI Tables
         Control.updateAllTables = function () {
             this.processTableClear();
@@ -304,6 +314,9 @@ var TSOS;
             this.processTableUpdate();
             this.memoryTableUpdate();
             this.CPUTableUpdate();
+            if (_DiskFormatted) {
+                this.diskTableUpdate();
+            }
         };
         return Control;
     }());

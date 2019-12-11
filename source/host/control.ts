@@ -283,8 +283,9 @@ module TSOS {
         }
 
         public static diskTableUpdate() {
-            //maybe clear the table??
-
+            // clear the table
+            this.diskTableClear();
+            // load the table
             var diskTable = <HTMLTableElement>document.getElementById("diskTable");
             var dataArray: String[];
             var rowNumber = 1;      // Used to keep track of the rows in the html table, starts at 1 to not overwrite the first row
@@ -333,6 +334,15 @@ module TSOS {
             }
         }
 
+        // Clear Disk Table
+        public static diskTableClear() {
+            var diskTable = <HTMLTableElement>document.getElementById("diskTable");
+                // delete each row
+                for (var i = diskTable.rows.length; i > 1; i--){
+                    diskTable.deleteRow(i-1);
+                }
+        }
+
 
 
         // Updates all GUI Tables
@@ -344,6 +354,9 @@ module TSOS {
             this.processTableUpdate();
             this.memoryTableUpdate();
             this.CPUTableUpdate();
+            if (_DiskFormatted) {
+                this.diskTableUpdate();
+            }
         }
     }
 }
