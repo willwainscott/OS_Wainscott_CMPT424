@@ -87,6 +87,34 @@ var TSOS;
                 }
             }
         };
+        // Used to find the TSB of the name block of a given file
+        DeviceDriverDisk.prototype.findFileTSB = function (fileName) {
+            var dataArray;
+            var dataName;
+            for (var j = 0; j < _Disk.sectors; j++) {
+                for (var k = 0; k < _Disk.sectors; k++) {
+                    dataArray = sessionStorage.getItem("0:" + j + ":" + k).split(",");
+                    dataName = this.getFileName(dataArray);
+                    if (dataName == fileName) {
+                        return "0:" + j + ":" + k;
+                    }
+                }
+            }
+            // if we get here we didn't find the file, so ...
+            return null;
+        };
+        DeviceDriverDisk.prototype.getFileName = function (dataArray) {
+            var fileName = "";
+            for (var w = 4; w < dataArray.length; w++) {
+                if (dataArray[w] == "00") {
+                    return fileName;
+                }
+                else {
+                    fileName += String.fromCharCode(TSOS.Utils.hexStringToDecimal(dataArray[w]));
+                }
+            }
+            return fileName;
+        };
         DeviceDriverDisk.prototype.createFile = function (fileName) {
             // W TODO Check for duplicate file names by using findFile function
             // Get the Name and Data TSBs
@@ -97,6 +125,10 @@ var TSOS;
             // Assign their used bits to 1 to show they are being used
             nameTSBArray[0] = "1";
             dataTSBArray[0] = "1";
+            // Make the next data File next bits FF:FF:FF to denote it is the last block for that file
+            dataTSBArray[1] = "FF";
+            dataTSBArray[2] = "FF";
+            dataTSBArray[3] = "FF";
             // Make the data the next TSB in the name
             nameTSBArray[1] = dataTSB[0];
             nameTSBArray[2] = dataTSB[2];
@@ -110,6 +142,32 @@ var TSOS;
             sessionStorage.setItem(nameTSB, nameTSBArray.join());
             sessionStorage.setItem(dataTSB, dataTSBArray.join());
             TSOS.Control.diskTableUpdate();
+        };
+        DeviceDriverDisk.prototype.readFile = function (fileNameTSB) {
+            // Used the Name TSB to get the first data TSB
+            var nameTSBArray = sessionStorage.getItem(fileNameTSB).split(",");
+            var dataTSBArray = sessionStorage.getItem(nameTSBArray[1] + ":" + nameTSBArray[2] + ":" + nameTSBArray[3]).split(",");
+            return this.readFileData(dataTSBArray);
+        };
+        DeviceDriverDisk.prototype.readFileData = function (fileArray) {
+            var fileData = null;
+            for (var i = 4; i < fileArray.length; i++) {
+                if (fileArray[i] == "00") {
+                    return fileData;
+                }
+                else {
+                    fileData += String.fromCharCode(TSOS.Utils.hexStringToDecimal(fileArray[i]));
+                }
+            }
+            // Some fancy recursion
+            var nextBlockTSB = fileArray[1] + ":" + fileArray[2] + ":" + fileArray[3];
+            if (nextBlockTSB == "FF:FF:FF") {
+                return fileData;
+            }
+            else {
+                fileData += this.readFileData(sessionStorage.getItem(nextBlockTSB).split(","));
+            }
+            // Note: if this works, this is something that I think is cool.
         };
         return DeviceDriverDisk;
     }(TSOS.DeviceDriver));

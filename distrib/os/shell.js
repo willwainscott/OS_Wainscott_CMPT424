@@ -98,6 +98,8 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellCreateFile, "create", "<filename> - Creates a file with an entered name.");
             this.commandList[this.commandList.length] = sc;
             //read
+            sc = new TSOS.ShellCommand(this.shellReadFile, "read", "<filename> - Reads a file's contents.");
+            this.commandList[this.commandList.length] = sc;
             //write
             //delete
             //ls
@@ -177,6 +179,12 @@ var TSOS;
                 case "prompt":
                     break;
                 case "create":
+                    break;
+                case "read":
+                    break;
+                case "write":
+                    break;
+                case "delete":
                     break;
                 default:
                     buffer = buffer.toLowerCase();
@@ -334,6 +342,9 @@ var TSOS;
                         break;
                     case "create":
                         _StdOut.putText("Creates a file and stores it in the file system.");
+                        break;
+                    case "read":
+                        _StdOut.putText("Reads the contents of a given file.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -754,6 +765,33 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Please format the disk before creating files.");
+            }
+        };
+        Shell.prototype.shellReadFile = function (args) {
+            // check to make sure the disk is formatted
+            if (_DiskFormatted) {
+                // check for a filename
+                if (args.length == 1) {
+                    var fileNameTSB = _krnDiskDriver.findFileTSB(args[0]);
+                    if (fileNameTSB != null) {
+                        var fileData = _krnDiskDriver.readFile(fileNameTSB);
+                        if (fileData != null) {
+                            _StdOut.putText(fileData);
+                        }
+                        else {
+                            _StdOut.putText("File has no content.");
+                        }
+                    }
+                    else {
+                        _StdOut.putText("File " + args[0] + " does not exist.");
+                    }
+                }
+                else {
+                    _StdOut.putText("Please enter a valid filename.");
+                }
+            }
+            else {
+                _StdOut.putText("Please format the disk before trying to read files you haven't created yet.");
             }
         };
         return Shell;
