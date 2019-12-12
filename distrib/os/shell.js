@@ -101,8 +101,14 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellReadFile, "read", "<filename> - Reads a file's contents.");
             this.commandList[this.commandList.length] = sc;
             //write
+            sc = new TSOS.ShellCommand(this.shellWriteFile, "write", "<filename> \"data\" - Writes data into a file.");
+            this.commandList[this.commandList.length] = sc;
             //delete
+            sc = new TSOS.ShellCommand(this.shellDeleteFile, "delete", "<filename> - Deletes a file from the disk system. Very permanent.");
+            this.commandList[this.commandList.length] = sc;
             //ls
+            sc = new TSOS.ShellCommand(this.shellListFiles, "ls", "- Lists all files on the disk.");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         };
@@ -345,6 +351,15 @@ var TSOS;
                         break;
                     case "read":
                         _StdOut.putText("Reads the contents of a given file.");
+                        break;
+                    case "write":
+                        _StdOut.putText("Writes data entered in double quotes to a given file name.");
+                        break;
+                    case "delete":
+                        _StdOut.putText("Deletes a file from the disk. Once you delete a file there is no recovering the file, so be careful!");
+                        break;
+                    case "ls":
+                        _StdOut.putText("Lists the files created on the disk.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -751,12 +766,21 @@ var TSOS;
             if (_DiskFormatted) {
                 // check to make sure they entered a filename
                 if (args.length == 1) {
-                    if (args[0].length < 60) {
-                        _krnDiskDriver.createFile(args[0]);
-                        _StdOut.putText("Successfully created file " + args[0]);
+                    if (!(args[0][0] == "~")) {
+                        if (args[0].length < 60) {
+                            if (_krnDiskDriver.createFile(args[0])) {
+                                _StdOut.putText("Successfully created file " + args[0]);
+                            }
+                            else {
+                                _StdOut.putText("File " + args[0] + " already exists!");
+                            }
+                        }
+                        else {
+                            _StdOut.putText("File name too big! Only name 60 character or less are allowed.");
+                        }
                     }
                     else {
-                        _StdOut.putText("File name too big! Only name 60 character or less are allowed.");
+                        _StdOut.putText("File name cannot start with \"~\"");
                     }
                 }
                 else {
@@ -775,7 +799,7 @@ var TSOS;
                     var fileNameTSB = _krnDiskDriver.findFileTSB(args[0]);
                     if (fileNameTSB != null) {
                         var fileData = _krnDiskDriver.readFile(fileNameTSB);
-                        if (fileData != null) {
+                        if (fileData != "") {
                             _StdOut.putText(fileData);
                         }
                         else {
@@ -791,7 +815,94 @@ var TSOS;
                 }
             }
             else {
-                _StdOut.putText("Please format the disk before trying to read files you haven't created yet.");
+                _StdOut.putText("Please format the disk before trying to read files you haven't created yet or written to yet.");
+            }
+        };
+        Shell.prototype.shellWriteFile = function (args) {
+            // checks to make sure the disk is formatted
+            if (_DiskFormatted) {
+                // checks for a filename and data
+                if (args.length > 1) {
+                    // checks to see if the data is in double quotes
+                    var firstWord = args[1];
+                    var lastWord = args[args.length - 1];
+                    if (firstWord.charAt(0) == "\"" && lastWord.charAt(lastWord.length - 1) == "\"") {
+                        // remove the quotes
+                        if (args.length == 2) {
+                            // the first word is also the last word
+                            firstWord = firstWord.slice(1, firstWord.length - 1);
+                            args[1] = firstWord;
+                        }
+                        else {
+                            firstWord = firstWord.slice(1, firstWord.length);
+                            args[1] = firstWord;
+                            lastWord = lastWord.slice(0, lastWord.length - 1);
+                            args[args.length - 1] = lastWord;
+                        }
+                        // check to make sure the file exists
+                        var fileNameTSB = _krnDiskDriver.findFileTSB(args[0]);
+                        if (fileNameTSB != null) {
+                            args.shift();
+                            // if all theses checks pass, write to the file
+                            _krnDiskDriver.writeFile(fileNameTSB, args.join(" "));
+                            _StdOut.putText("File written to successfully.");
+                        }
+                        else {
+                            _StdOut.putText("File " + args[0] + " does not exist.");
+                        }
+                    }
+                    else {
+                        _StdOut.putText("Please put your data in double quotes.");
+                    }
+                }
+                else {
+                    _StdOut.putText("Please enter a file name and the data surrounded by double quotes.");
+                }
+            }
+            else {
+                _StdOut.putText("Please format the disk before trying to write to files you haven't created yet.");
+            }
+        };
+        Shell.prototype.shellDeleteFile = function (args) {
+            // check to make sure the disk is formatted
+            if (_DiskFormatted) {
+                // check to make sure they entered a filename
+                if (args.length == 1) {
+                    // check to make sure they entered a file that exists
+                    var fileNameTSB = _krnDiskDriver.findFileTSB(args[0]);
+                    if (fileNameTSB != null) {
+                        // delete the file
+                        _krnDiskDriver.deleteFile(fileNameTSB);
+                        _StdOut.putText("File " + args[0] + " successfully deleted.");
+                    }
+                    else {
+                        _StdOut.putText("File " + args[0] + " does not exist.");
+                    }
+                }
+                else {
+                    _StdOut.putText("Please enter a file name.");
+                }
+            }
+            else {
+                _StdOut.putText("Please format the disk before trying to delete files you haven't created yet.");
+            }
+        };
+        // returns all of the files that have been created
+        Shell.prototype.shellListFiles = function (args) {
+            var fileNamesArray = _krnDiskDriver.getAllFileNames();
+            if (_DiskFormatted) {
+                if (!(fileNamesArray.length == 0)) {
+                    for (var i = 0; i < fileNamesArray.length; i++) {
+                        _StdOut.putText(fileNamesArray[i]);
+                        _StdOut.advanceLine();
+                    }
+                }
+                else {
+                    _StdOut.putText("No files on the disk.");
+                }
+            }
+            else {
+                _StdOut.putText("Please format the disk before trying to list files you haven't created yet.");
             }
         };
         return Shell;

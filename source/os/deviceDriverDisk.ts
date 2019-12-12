@@ -26,6 +26,7 @@ module TSOS {
             // More?
         }
 
+        // formats the disk to all 00s
         public formatDisk() {
             // Create an empty block array
             var emptyBlock: String[] = new Array(64);
@@ -79,6 +80,7 @@ module TSOS {
                 }
             }
         }
+
         // Used to find the TSB of the name block of a given file
         public findFileTSB(fileName: String) {
             var dataArray: string[];
@@ -96,6 +98,7 @@ module TSOS {
             return null;
         }
 
+        // returns the file name from the data blocks
         public getFileName(dataArray: string[]) {
             var fileName: string = "";
             for(var w = 4; w < dataArray.length; w++) {
@@ -108,40 +111,64 @@ module TSOS {
             return fileName;
         }
 
-        public createFile(fileName: String) {
-            // W TODO Check for duplicate file names by using findFile function
-
-            // Get the Name and Data TSBs
-            var nameTSB:string = this.firstAvailableNameTSB();
-            var dataTSB:string = this.firstAvailableDataTSB();
-            var nameTSBArray: string[] = sessionStorage.getItem(nameTSB).split(",");
-            var dataTSBArray: string[] = sessionStorage.getItem(dataTSB).split(",");
-
-            // Assign their used bits to 1 to show they are being used
-            nameTSBArray[0] = "1";
-            dataTSBArray[0] = "1";
-
-            // Make the next data File next bits FF:FF:FF to denote it is the last block for that file
-            dataTSBArray[1] = "FF";
-            dataTSBArray[2] = "FF";
-            dataTSBArray[3] = "FF";
-
-            // Make the data the next TSB in the name
-            nameTSBArray[1] = dataTSB[0];
-            nameTSBArray[2] = dataTSB[2];
-            nameTSBArray[3] = dataTSB[4];
-
-            // Enter the file name into the nameTSB Data section
-            for (var i = 0; i < fileName.length; i++) {
-                nameTSBArray[i + 4] = Utils.decimalToHexString(fileName.charCodeAt(i));
+        public getAllFileNames() {
+            var fileNameArray: string[] = [];
+            var tempBlockArray: string[];
+            var swapFile: boolean = false;
+            for (var j = 0; j < _Disk.sectors; j++) {
+                for (var k = 0; k < _Disk.blocks; k++) {
+                    tempBlockArray = sessionStorage.getItem("0:" + j + ":" + k).split(",");
+                    swapFile = (String.fromCharCode(Utils.hexStringToDecimal(tempBlockArray[4])) == "~"); //If its a swap file
+                    if (tempBlockArray[0] == "1" && !swapFile) {
+                        fileNameArray[fileNameArray.length] = this.getFileName(tempBlockArray);
+                    }
+                }
             }
+            return fileNameArray;
 
-            // Save the arrays back into the session storage
-            console.log(nameTSBArray);
-            sessionStorage.setItem(nameTSB, nameTSBArray.join());
-            sessionStorage.setItem(dataTSB, dataTSBArray.join());
+        }
 
-            Control.diskTableUpdate();
+        // returns true if the file was created successfully, returns false if there was a duplicate file
+        public createFile(fileName: String) {
+            // Check for duplicate file names by using findFileTSB function
+            if (this.findFileTSB(fileName) == null) {
+
+                // Get the Name and Data TSBs
+                var nameTSB:string = this.firstAvailableNameTSB();
+                var dataTSB:string = this.firstAvailableDataTSB();
+                var nameTSBArray: string[] = sessionStorage.getItem(nameTSB).split(",");
+                var dataTSBArray: string[] = sessionStorage.getItem(dataTSB).split(",");
+
+                // Assign their used bits to 1 to show they are being used
+                nameTSBArray[0] = "1";
+                dataTSBArray[0] = "1";
+
+                // Make the next data File next bits FF:FF:FF to denote it is the last block for that file
+                dataTSBArray[1] = "FF";
+                dataTSBArray[2] = "FF";
+                dataTSBArray[3] = "FF";
+
+                // Make the data the next TSB in the name
+                nameTSBArray[1] = dataTSB[0];
+                nameTSBArray[2] = dataTSB[2];
+                nameTSBArray[3] = dataTSB[4];
+
+                // Enter the file name into the nameTSB Data section
+                for (var i = 0; i < fileName.length; i++) {
+                    nameTSBArray[i + 4] = Utils.decimalToHexString(fileName.charCodeAt(i));
+                }
+
+                // Save the arrays back into the session storage
+                console.log(nameTSBArray);
+                sessionStorage.setItem(nameTSB, nameTSBArray.join());
+                sessionStorage.setItem(dataTSB, dataTSBArray.join());
+
+                Control.diskTableUpdate();
+
+                return true;
+            } else {
+                return false;
+            }
         }
 
         public readFile(fileNameTSB: string) {
@@ -153,8 +180,9 @@ module TSOS {
 
         }
 
+        // returns the string that contains the data in a file
         public readFileData(fileArray: string[]){
-            var fileData: string = null;
+            var fileData: string = "";
             for (var i = 4; i < fileArray.length; i++) {
                 if (fileArray[i] == "00"){
                     return fileData;
@@ -170,6 +198,96 @@ module TSOS {
                 fileData += this.readFileData(sessionStorage.getItem(nextBlockTSB).split(","));
             }
             // Note: if this works, this is something that I think is cool.
+        }
+
+        public writeFile(fileNameTSB: string, userData: string) {
+            // since write overwrites anything written in a file, we can just delete all the data blocks and start over so we don't have extra data blocks allocated
+            this.deleteFileDataBlock(fileNameTSB);
+            /* this way of doing it was Danny Grossman's idea (dgrossmann144 of GitHub), no code has been copied,
+            and he gave me permission to use this method. What a cool guy.*/
+
+            // get the block where the data will be stored
+            var nameBlockArray = sessionStorage.getItem(fileNameTSB).split(",");
+            var dataBlockTSB = nameBlockArray[1] + ":" + nameBlockArray[2] + ":" + nameBlockArray[3];
+
+            // Create an array of hex pairs to add to the file
+            var userDataArray: string[] = [];
+            for(var i = 0; i < userData.length; i++) {
+                userDataArray[userDataArray.length] = Utils.decimalToHexString(userData.charCodeAt(i));
+            }
+            // Write to the actual data blocks
+            this.writeToDataBlocks(userDataArray,dataBlockTSB);
+
+            Control.diskTableUpdate();
+        }
+
+        // writes the data given in an array to one or many data blocks depending on how much room is required
+        public writeToDataBlocks(userDataArray: string[], dataBlockTSB: string) {
+            var nextBlockTSB: string = this.firstAvailableDataTSB(); // In case the data is > 60
+            // if we need more than one block for the file do some fancy recursion!
+            if (userDataArray.length > 60) {
+                var newUserDataArray = userDataArray.splice(0,60);
+                this.writeToDataBlocks(newUserDataArray,nextBlockTSB);  // So much recursion! Very cool!
+                // make the array of the data start with the used bit and the three digits of the next TSB
+                var dataBlockArray: string[] = ["1",nextBlockTSB[0],nextBlockTSB[2], nextBlockTSB[4]];
+                // then add the data from the userDataArray
+                for (var i = 0; i < 60; i++){
+                    dataBlockArray[dataBlockArray.length] = userDataArray[i];
+                }
+                // and put it into session storage
+                sessionStorage.setItem(dataBlockTSB,dataBlockArray.join());
+            } else {    //this happens if we dont need another data block
+                // we add 00s to the end of the userDataArray to make sure it is the correct length
+                for (var i = userDataArray.length; i < 60; i++) {
+                    userDataArray[userDataArray.length] = "00";
+                }
+                // we then make the used bit and next TSB array
+                var lastBlockArray = ["1","FF","FF","FF"];  // Used to add to the front of the userData
+                // and store it in session storage by adding it to the front of the userData
+                sessionStorage.setItem(dataBlockTSB, lastBlockArray.concat(userDataArray).join());
+            }
+        }
+
+        public deleteFile(fileNameTSB: string) {
+            // deletes both the data blocks and the name block
+            this.deleteFileDataBlock(fileNameTSB);
+            this.deleteFileNameBlock(fileNameTSB);
+            // update the GUI
+            Control.diskTableUpdate();
+        }
+
+        // deletes the block that stores the file name
+        public deleteFileNameBlock(fileNameTSB: string){
+            var emptyBlock: String[] = new Array(64);
+            for (var i = 0; i < emptyBlock.length; i++) {
+                if (i < 4) {
+                    emptyBlock[i] = "0";
+                } else {
+                    emptyBlock[i] = "00"
+                }
+            }
+            sessionStorage.setItem(fileNameTSB, emptyBlock.join());
+        }
+
+        // deletes the block(s) that hold the file data
+        public deleteFileDataBlock(fileNameTSB: string) {
+            var nameBlockArray = sessionStorage.getItem(fileNameTSB).split(",");
+            var dataBlockTSB = nameBlockArray[1] + ":" + nameBlockArray[2] + ":" + nameBlockArray[3];
+            var dataBlockArray = sessionStorage.getItem(dataBlockTSB).split(",");
+            var nextBlockTSB = dataBlockArray[1] + ":" + dataBlockArray[2] + ":" + dataBlockArray[3];
+            if (nextBlockTSB != "FF:FF:FF"){
+                this.deleteFileDataBlock(dataBlockTSB);  // More recursion??? Man this guys is on fire!
+            }
+            var emptyBlock: String[] = new Array(64);
+            for (var i = 0; i < emptyBlock.length; i++) {
+                if (i < 4) {
+                    emptyBlock[i] = "0";
+                } else {
+                    emptyBlock[i] = "00"
+                }
+            }
+            sessionStorage.setItem(dataBlockTSB, emptyBlock.join());
+
         }
 
     }
