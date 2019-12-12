@@ -191,6 +191,7 @@ var TSOS;
             }
             else {
                 fileData += this.readFileData(sessionStorage.getItem(nextBlockTSB).split(","));
+                return fileData;
             }
             // Note: if this works, this is something that I think is cool.
         };
@@ -202,6 +203,20 @@ var TSOS;
             // get the block where the data will be stored
             var nameBlockArray = sessionStorage.getItem(fileNameTSB).split(",");
             var dataBlockTSB = nameBlockArray[1] + ":" + nameBlockArray[2] + ":" + nameBlockArray[3];
+            // make the data block in use because we deleted all the previous blocks
+            // Create an empty block array
+            var emptyBlock = new Array(64);
+            for (var i = 0; i < emptyBlock.length; i++) {
+                if (i < 4) {
+                    emptyBlock[i] = "0";
+                }
+                else {
+                    emptyBlock[i] = "00";
+                }
+            }
+            // and change used bit back to in use
+            emptyBlock[0] = "1";
+            sessionStorage.setItem(dataBlockTSB, emptyBlock.join());
             // Create an array of hex pairs to add to the file
             var userDataArray = [];
             for (var i = 0; i < userData.length; i++) {
@@ -217,12 +232,12 @@ var TSOS;
             // if we need more than one block for the file do some fancy recursion!
             if (userDataArray.length > 60) {
                 var newUserDataArray = userDataArray.splice(0, 60);
-                this.writeToDataBlocks(newUserDataArray, nextBlockTSB); // So much recursion! Very cool!
+                this.writeToDataBlocks(userDataArray, nextBlockTSB); // So much recursion! Very cool!
                 // make the array of the data start with the used bit and the three digits of the next TSB
                 var dataBlockArray = ["1", nextBlockTSB[0], nextBlockTSB[2], nextBlockTSB[4]];
                 // then add the data from the userDataArray
                 for (var i = 0; i < 60; i++) {
-                    dataBlockArray[dataBlockArray.length] = userDataArray[i];
+                    dataBlockArray[dataBlockArray.length] = newUserDataArray[i];
                 }
                 // and put it into session storage
                 sessionStorage.setItem(dataBlockTSB, dataBlockArray.join());
