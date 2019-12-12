@@ -62,7 +62,7 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellError, "error", "- Simulates an OS error.");
             this.commandList[this.commandList.length] = sc;
             //load
-            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Loads entered user code.");
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "<priority> - Loads entered user code with an optional priority.");
             this.commandList[this.commandList.length] = sc;
             //run
             sc = new TSOS.ShellCommand(this.shellRun, "run", "<PID> - Runs a process based on a given Process ID.");
@@ -84,6 +84,30 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             //quantum
             sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "- Changes the round robin quantum.");
+            this.commandList[this.commandList.length] = sc;
+            //setschedule
+            sc = new TSOS.ShellCommand(this.shellSetSchedule, "setschedule", "<rr|fcfs|priority> - Changes the current scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+            //getschedule
+            sc = new TSOS.ShellCommand(this.shellGetSchedule, "getschedule", "- Returns the current scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+            //format
+            sc = new TSOS.ShellCommand(this.shellFormat, "format", "- Formats the disk to allow file storage and virtual memory.");
+            this.commandList[this.commandList.length] = sc;
+            //create
+            sc = new TSOS.ShellCommand(this.shellCreateFile, "create", "<filename> - Creates a file with an entered name.");
+            this.commandList[this.commandList.length] = sc;
+            //read
+            sc = new TSOS.ShellCommand(this.shellReadFile, "read", "<filename> - Reads a file's contents.");
+            this.commandList[this.commandList.length] = sc;
+            //write
+            sc = new TSOS.ShellCommand(this.shellWriteFile, "write", "<filename> \"data\" - Writes data into a file.");
+            this.commandList[this.commandList.length] = sc;
+            //delete
+            sc = new TSOS.ShellCommand(this.shellDeleteFile, "delete", "<filename> - Deletes a file from the disk system. Very permanent.");
+            this.commandList[this.commandList.length] = sc;
+            //ls
+            sc = new TSOS.ShellCommand(this.shellListFiles, "ls", "- Lists all files on the disk.");
             this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
@@ -159,6 +183,14 @@ var TSOS;
                 case "rot13":
                     break;
                 case "prompt":
+                    break;
+                case "create":
+                    break;
+                case "read":
+                    break;
+                case "write":
+                    break;
+                case "delete":
                     break;
                 default:
                     buffer = buffer.toLowerCase();
@@ -282,7 +314,7 @@ var TSOS;
                         _StdOut.putText("Simulates an OS error and violently dies.");
                         break;
                     case "load":
-                        _StdOut.putText("Loads user code entered in the text area into memory.");
+                        _StdOut.putText("Loads user code entered in the text area into memory. User can also add a priority for the process. Process priority defaulted to 10.");
                         break;
                     case "run":
                         _StdOut.putText("Runs a loaded program based on the Process ID.");
@@ -304,6 +336,30 @@ var TSOS;
                         break;
                     case "quantum":
                         _StdOut.putText("Changes the round robin quantum for process scheduling.");
+                        break;
+                    case "setschedule":
+                        _StdOut.putText("Changes the current scheduling algorithm to Round Robin, First Come First Serve, or Priority.");
+                        break;
+                    case "getschedule":
+                        _StdOut.putText("Returns the current scheduling algorithm.");
+                        break;
+                    case "format":
+                        _StdOut.putText("Formats the disk for file storage and virtual memory swapping.");
+                        break;
+                    case "create":
+                        _StdOut.putText("Creates a file and stores it in the file system.");
+                        break;
+                    case "read":
+                        _StdOut.putText("Reads the contents of a given file.");
+                        break;
+                    case "write":
+                        _StdOut.putText("Writes data entered in double quotes to a given file name.");
+                        break;
+                    case "delete":
+                        _StdOut.putText("Deletes a file from the disk. Once you delete a file there is no recovering the file, so be careful!");
+                        break;
+                    case "ls":
+                        _StdOut.putText("Lists the files created on the disk.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -412,6 +468,23 @@ var TSOS;
             // remove and leading or trailing spaces
             userCode = TSOS.Utils.trim(userCode);
             var valid = true;
+            var priority = 10;
+            // Check for user entered priority
+            if (args.length > 0) { // If the arguments is longer than 1 (there is something after the 'load' command)...
+                if (args.length == 1 && !(isNaN(Number(args[0])))) { // If only one number is entered and its a number ...
+                    if (parseInt(args[0]) < 100 && parseInt(args[0]) > 0) {
+                        priority = parseInt(args[0]);
+                    }
+                    else {
+                        _StdOut.putText("Please enter a priority greater than 0 and less than 100.");
+                        return;
+                    }
+                }
+                else {
+                    _StdOut.putText("Please enter a valid number for a priority.");
+                    return;
+                }
+            }
             var charArray = userCode.split(''); //makes array of every char the user entered
             var stringArray = userCode.split(' '); // makes array of every space separated string
             for (var _i = 0, charArray_1 = charArray; _i < charArray_1.length; _i++) {
@@ -462,23 +535,27 @@ var TSOS;
                 if (_MemoryManager.memoryAvailabilityCheck()) {
                     //Make every character in the codes uppercase
                     userCode = userCode.toUpperCase();
+                    // split it into an array
+                    var userCodeArray = userCode.split(" ");
                     //load it into memory ...
                     // create a PCB
                     var PCB = new TSOS.PCB();
                     // give it a PID
                     PCB.PID = _PIDCounter;
                     _PIDCounter++; // Increment to prevent duplicate PIDs
+                    // give it a priority
+                    PCB.priority = priority;
+                    //Assign it a location
+                    PCB.location = "Memory";
                     // Assign it a section in memory
                     PCB.section = _MemoryManager.assignMemorySection();
                     //Add it to global list of Resident PCBs
                     _PCBList[_PCBList.length] = PCB;
                     console.log(_PCBList);
                     //clear memory before loading
-                    // NOTE: Will probably change it such that when a program is completed or terminated the memory is cleared
-                    // instead of keeping the old program in memory and only removing it when a new one is loaded
                     _MemoryManager.clearMemory(PCB.section);
                     //use memory manager to load
-                    _MemoryManager.loadMemory(userCode, PCB.section);
+                    _MemoryManager.loadMemory(userCodeArray, PCB.section, PCB.PID);
                     // Update the PCB's IR
                     PCB.IR = _MemoryAccessor.readMemoryToHex(PCB.section, PCB.PC);
                     // Update Memory GUI
@@ -494,12 +571,53 @@ var TSOS;
                     }
                     _StdOut.putText("Process ID Number: " + PCB.PID);
                 }
+                else if (_DiskFormatted) {
+                    _StdOut.putText("Memory is full. Loading process onto disk.");
+                    _StdOut.advanceLine();
+                    //Make every character in the codes uppercase
+                    userCode = userCode.toUpperCase();
+                    // split it into an array
+                    var userCodeArray = userCode.split(" ");
+                    //load it into memory ...
+                    // create a PCB
+                    var PCB = new TSOS.PCB();
+                    // give it a PID
+                    PCB.PID = _PIDCounter;
+                    _PIDCounter++; // Increment to prevent duplicate PIDs
+                    // give it a priority
+                    PCB.priority = priority;
+                    // Assign it a location
+                    PCB.location = "Disk";
+                    // Assign it a section
+                    PCB.section = "disk";
+                    //Add it to global list of Resident PCBs
+                    _PCBList[_PCBList.length] = PCB;
+                    console.log(_PCBList);
+                    //use memory manager to load
+                    _MemoryManager.loadMemory(userCodeArray, PCB.section, PCB.PID);
+                    // Update the PCB's IR
+                    PCB.IR = userCode[0] + userCode[1] + "";
+                    // Make the times swapped 1 to make it more fair for processes who started out on the disk
+                    PCB.timesSwapped = 1;
+                    // Update Memory GUI
+                    TSOS.Control.memoryTableUpdate();
+                    // Update PCB GUI
+                    TSOS.Control.processTableUpdate();
+                    // print out response
+                    _StdOut.putText("User code loaded successfully");
+                    _StdOut.advanceLine();
+                    if (_SarcasticMode) {
+                        _StdOut.putText("Congrats, you're not completely useless.");
+                        _StdOut.advanceLine();
+                    }
+                    _StdOut.putText("Process ID Number: " + PCB.PID);
+                }
                 else {
-                    _StdOut.putText("Memory is full. Please run a process or clear the memory to load.");
+                    _StdOut.putText("Memory is full. Please format disk to load more processes.");
                 }
             }
             else {
-                _StdOut.putText("Please ensure user code is valid hexadecimal");
+                _StdOut.putText("Please ensure user code is valid hexadecimal.");
             }
         };
         Shell.prototype.shellRun = function (args) {
@@ -575,6 +693,10 @@ var TSOS;
                             _CurrentPCB = null;
                         }
                     }
+                    //if it was on the disk, remove it from the disk
+                    if (_MemoryManager.getPCBByPID(enteredPID).section == "disk") {
+                        _krnDiskDriver.deleteFileByName("~SwapFile " + enteredPID);
+                    }
                     // Clear that section in memory
                     _MemoryManager.clearMemory(_MemoryManager.getPCBByPID(enteredPID).section);
                     // remove it from the _PCBList(s)
@@ -604,6 +726,7 @@ var TSOS;
             }
             _StdOut.putText("terminated through user killall command.");
             _CurrentPCB = null;
+            _krnDiskDriver.deleteAllSwapFiles();
             _PCBList = [];
             _ReadyPCBList = [];
             _MemoryManager.clearMemory("all");
@@ -612,10 +735,222 @@ var TSOS;
         Shell.prototype.shellQuantum = function (args) {
             // Check to see if the entered Quantum is valid
             if ((args.length = 1) && !(isNaN(Number(args[0])))) { //Checks to see if the arg is there and is actually a number
-                _RRQuantum = parseInt(args[0]);
+                if (parseInt(args[0]) > 0) {
+                    _RRQuantum = parseInt(args[0]);
+                }
+                else {
+                    _StdOut.putText("Please enter a quantum greater than 0.");
+                }
             }
             else {
                 _StdOut.putText("Please enter a valid quantum");
+            }
+        };
+        Shell.prototype.shellSetSchedule = function (args) {
+            var enteredAlgorithm = args[0];
+            switch (enteredAlgorithm) {
+                case "rr":
+                    if (_SchedulingAlgorithm == "Round Robin") {
+                        _StdOut.putText("The current scheduling algorithm is already " + _SchedulingAlgorithm + ".");
+                        if (_SarcasticMode) { // some extra flavor so I can keep my sanity
+                            _StdOut.advanceLine();
+                            _StdOut.putText("Idiot.");
+                        }
+                    }
+                    else {
+                        _SchedulingAlgorithm = "Round Robin";
+                        _RRQuantum = _TempQuantum; //This is where the quantum before the change to fcfs was stored
+                        _StdOut.putText("Scheduling Algorithm set to Round Robin.");
+                    }
+                    break;
+                case "fcfs":
+                    if (_SchedulingAlgorithm == "First Come First Serve") {
+                        _StdOut.putText("The current scheduling algorithm is already " + _SchedulingAlgorithm + ".");
+                        if (_SarcasticMode) {
+                            _StdOut.advanceLine();
+                            _StdOut.putText("Idiot.");
+                        }
+                    }
+                    else {
+                        _SchedulingAlgorithm = "First Come First Serve";
+                        _TempQuantum = _RRQuantum;
+                        _RRQuantum = Number.MAX_VALUE;
+                        _StdOut.putText("Scheduling Algorithm set to First Come First Serve.");
+                    }
+                    break;
+                case "priority":
+                    if (_SchedulingAlgorithm == "Priority") {
+                        _StdOut.putText("The current scheduling algorithm is already " + _SchedulingAlgorithm + ".");
+                        if (_SarcasticMode) {
+                            _StdOut.advanceLine();
+                            _StdOut.putText("Idiot.");
+                        }
+                    }
+                    else {
+                        _SchedulingAlgorithm = "Priority";
+                        _StdOut.putText("Scheduling Algorithm set to Priority.");
+                    }
+                    break;
+                default:
+                    _StdOut.putText("Please enter a valid Scheduling Algorithm.");
+            }
+        };
+        Shell.prototype.shellGetSchedule = function (args) {
+            _StdOut.putText("The current Scheduling Algorithm is " + _SchedulingAlgorithm + ".");
+        };
+        Shell.prototype.shellFormat = function (args) {
+            // check to see if the disk is formatted
+            if (_DiskFormatted) {
+                _StdOut.putText("Disk Already Formatted! Disk can only be formatted once!");
+            }
+            else {
+                _krnDiskDriver.formatDisk();
+                _DiskFormatted = true;
+                _StdOut.putText("Disk Fomatted Successfully!");
+            }
+        };
+        Shell.prototype.shellCreateFile = function (args) {
+            // check to make sure the disk is formatted
+            if (_DiskFormatted) {
+                // check to make sure they entered a filename
+                if (args.length == 1) {
+                    if (!(args[0][0] == "~")) {
+                        if (args[0].length < 60) {
+                            if (_krnDiskDriver.createFile(args[0])) {
+                                _StdOut.putText("Successfully created file " + args[0]);
+                            }
+                            else {
+                                _StdOut.putText("File " + args[0] + " already exists!");
+                            }
+                        }
+                        else {
+                            _StdOut.putText("File name too big! Only name 60 character or less are allowed.");
+                        }
+                    }
+                    else {
+                        _StdOut.putText("File name cannot start with \"~\"");
+                    }
+                }
+                else {
+                    _StdOut.putText("Please enter a valid filename.");
+                }
+            }
+            else {
+                _StdOut.putText("Please format the disk before creating files.");
+            }
+        };
+        Shell.prototype.shellReadFile = function (args) {
+            // check to make sure the disk is formatted
+            if (_DiskFormatted) {
+                // check for a filename
+                if (args.length == 1) {
+                    var fileNameTSB = _krnDiskDriver.findFileTSB(args[0]);
+                    if (fileNameTSB != null) {
+                        var fileData = _krnDiskDriver.readFile(fileNameTSB);
+                        if (fileData != "") {
+                            _StdOut.putText(fileData);
+                        }
+                        else {
+                            _StdOut.putText("File has no content.");
+                        }
+                    }
+                    else {
+                        _StdOut.putText("File " + args[0] + " does not exist.");
+                    }
+                }
+                else {
+                    _StdOut.putText("Please enter a valid filename.");
+                }
+            }
+            else {
+                _StdOut.putText("Please format the disk before trying to read files you haven't created yet or written to yet.");
+            }
+        };
+        Shell.prototype.shellWriteFile = function (args) {
+            // checks to make sure the disk is formatted
+            if (_DiskFormatted) {
+                // checks for a filename and data
+                if (args.length > 1) {
+                    // checks to see if the data is in double quotes
+                    var firstWord = args[1];
+                    var lastWord = args[args.length - 1];
+                    if (firstWord.charAt(0) == "\"" && lastWord.charAt(lastWord.length - 1) == "\"") {
+                        // remove the quotes
+                        if (args.length == 2) {
+                            // the first word is also the last word
+                            firstWord = firstWord.slice(1, firstWord.length - 1);
+                            args[1] = firstWord;
+                        }
+                        else {
+                            firstWord = firstWord.slice(1, firstWord.length);
+                            args[1] = firstWord;
+                            lastWord = lastWord.slice(0, lastWord.length - 1);
+                            args[args.length - 1] = lastWord;
+                        }
+                        // check to make sure the file exists
+                        var fileNameTSB = _krnDiskDriver.findFileTSB(args[0]);
+                        if (fileNameTSB != null) {
+                            args.shift();
+                            // if all theses checks pass, write to the file
+                            _krnDiskDriver.writeFile(fileNameTSB, args.join(" "), "user");
+                            _StdOut.putText("File written to successfully.");
+                        }
+                        else {
+                            _StdOut.putText("File " + args[0] + " does not exist.");
+                        }
+                    }
+                    else {
+                        _StdOut.putText("Please put your data in double quotes.");
+                    }
+                }
+                else {
+                    _StdOut.putText("Please enter a file name and the data surrounded by double quotes.");
+                }
+            }
+            else {
+                _StdOut.putText("Please format the disk before trying to write to files you haven't created yet.");
+            }
+        };
+        Shell.prototype.shellDeleteFile = function (args) {
+            // check to make sure the disk is formatted
+            if (_DiskFormatted) {
+                // check to make sure they entered a filename
+                if (args.length == 1) {
+                    // check to make sure they entered a file that exists
+                    var fileNameTSB = _krnDiskDriver.findFileTSB(args[0]);
+                    if (fileNameTSB != null) {
+                        // delete the file
+                        _krnDiskDriver.deleteFile(fileNameTSB);
+                        _StdOut.putText("File " + args[0] + " successfully deleted.");
+                    }
+                    else {
+                        _StdOut.putText("File " + args[0] + " does not exist.");
+                    }
+                }
+                else {
+                    _StdOut.putText("Please enter a file name.");
+                }
+            }
+            else {
+                _StdOut.putText("Please format the disk before trying to delete files you haven't created yet.");
+            }
+        };
+        // returns all of the files that have been created
+        Shell.prototype.shellListFiles = function (args) {
+            var fileNamesArray = _krnDiskDriver.getAllFileNames();
+            if (_DiskFormatted) {
+                if (!(fileNamesArray.length == 0)) {
+                    for (var i = 0; i < fileNamesArray.length; i++) {
+                        _StdOut.putText(fileNamesArray[i]);
+                        _StdOut.advanceLine();
+                    }
+                }
+                else {
+                    _StdOut.putText("No files on the disk.");
+                }
+            }
+            else {
+                _StdOut.putText("Please format the disk before trying to list files you haven't created yet.");
             }
         };
         return Shell;

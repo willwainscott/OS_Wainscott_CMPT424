@@ -17,6 +17,7 @@
    <script type="text/javascript" src="distrib/host/cpu.js"></script>
    <script type="text/javascript" src="distrib/host/memory.js"></script>
    <script type="text/javascript" src="distrib/host/memoryAccessor.js"></script>
+   <script type="text/javascript" src="distrib/host/disk.js"></script>
 
    <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
    <script type="text/javascript" src="distrib/os/interrupt.js"></script>
@@ -32,12 +33,13 @@
    <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
    <script type="text/javascript" src="distrib/os/pcb.js"></script>
    <script type="text/javascript" src="distrib/os/scheduler.js"></script>
+   <script type="text/javascript" src="distrib/os/deviceDriverDisk.js"></script>
 
 
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment the line below to enable GLaDOS testing. -->
-   <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip3.js"></script> -->
+   <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip4.js"></script> 
 
 </head>
 
@@ -1227,31 +1229,41 @@
 
    <div id="divProcesses" style="width:fit-content; margin:4px;">
       <label>Processes</label>
-      <div id="divProcessTable"></div>
-      <table id ="ProcessTable">
-         <tr>
-            <th>PID</th>
-            <th>PC</th>
-            <th>IR</th>
-            <th>ACC</th>
-            <th>X</th>
-            <th>Y</th>
-            <th>Z</th>
-            <th>State</th>
-            <th>Location</th>
-         </tr>
-         <tr>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-         </tr>
-      </table>
+      <div id="divProcessTable">
+         <table id ="ProcessTable">
+            <tr>
+               <th>PID</th>
+               <th>PC</th>
+               <th>IR</th>
+               <th>ACC</th>
+               <th>X</th>
+               <th>Y</th>
+               <th>Z</th>
+               <th>State</th>
+               <th>Location</th>
+            </tr>
+            <tr>
+               <td>-</td>
+               <td>-</td>
+               <td>-</td>
+               <td>-</td>
+               <td>-</td>
+               <td>-</td>
+               <td>-</td>
+               <td>-</td>
+               <td>-</td>
+            </tr>
+         </table>
+      </div>
+   </div>
+
+   <div id="divDisk" style="margin:4px;">
+      <label>Disk</label>
+      <div id="divDiskTable" style="overflow:scroll; width: 1000px; height: 250px;">
+         <table id="diskTable" style="height:250px; width:100%; ">
+            <!-- this is where the cells go for the disk -->
+         </table>
+      </div>
    </div>
 
 

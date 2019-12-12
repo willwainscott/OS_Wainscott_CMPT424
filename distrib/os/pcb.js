@@ -18,7 +18,9 @@ var TSOS;
         state, //State of the process
         location, //Location (in memory/on the disk)
         section, //The section of memory it is in (or on the hard drive)
-        quantaRun) {
+        quantaRun, //The number of times the process is run relative to the quanta in Round Robin
+        priority, //The priority used for priority scheduling
+        timesSwapped) {
             if (PID === void 0) { PID = 0; }
             if (PC === void 0) { PC = 0; }
             if (IR === void 0) { IR = ""; }
@@ -27,9 +29,11 @@ var TSOS;
             if (Yreg === void 0) { Yreg = 0; }
             if (Zflag === void 0) { Zflag = 0; }
             if (state === void 0) { state = "Resident"; }
-            if (location === void 0) { location = "Memory"; }
+            if (location === void 0) { location = ""; }
             if (section === void 0) { section = ""; }
             if (quantaRun === void 0) { quantaRun = 0; }
+            if (priority === void 0) { priority = 10; }
+            if (timesSwapped === void 0) { timesSwapped = 0; }
             this.PID = PID;
             this.PC = PC;
             this.IR = IR;
@@ -41,6 +45,8 @@ var TSOS;
             this.location = location;
             this.section = section;
             this.quantaRun = quantaRun;
+            this.priority = priority;
+            this.timesSwapped = timesSwapped;
         }
         return PCB;
     }());

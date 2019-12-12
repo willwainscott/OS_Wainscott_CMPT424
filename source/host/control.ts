@@ -105,6 +105,10 @@ module TSOS {
             // ... throw an Accessor in there while you're at it so we can access our new memory ...
             _MemoryAccessor = new MemoryAccessor();
 
+            // ... Create and initialize our sweet disk ...
+            _Disk = new Disk();
+
+
 
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
@@ -278,6 +282,69 @@ module TSOS {
             }
         }
 
+        public static diskTableUpdate() {
+            // clear the table
+            this.diskTableClear();
+            // load the table
+            var diskTable = <HTMLTableElement>document.getElementById("diskTable");
+            var dataArray: String[];
+            var rowNumber = 1;      // Used to keep track of the rows in the html table, starts at 1 to not overwrite the first row
+            // Add Header row
+            var headerRow = diskTable.insertRow(0);
+            headerRow.style.fontWeight = "bold"
+            // TSB Cell
+            var headerTSB = headerRow.insertCell(0);
+            headerTSB.innerHTML = "T:S:B";
+            // Used Cell
+            var headerUsed = headerRow.insertCell(1);
+            headerUsed.innerHTML = "Used";
+            // Next Cell
+            var headerNext = headerRow.insertCell(2);
+            headerNext.innerHTML = "Next";
+            // Data Cell
+            var headerData = headerRow.insertCell(3);
+            headerData.innerHTML = "Data";
+            // Now add rows for each block on the disk
+            for (var i = 0; i < _Disk.tracks; i++) {
+                for (var j = 0; j < _Disk.sectors; j++) {
+                    for (var k = 0; k < _Disk.blocks; k++) {
+                        // We have to get disk data from session storage ...
+                        dataArray = sessionStorage.getItem(i + ":" + j +":" + k).split(",");
+                        // ... create the table row ...
+                        var row = diskTable.insertRow(rowNumber);
+                        rowNumber++;
+                        // ... create the TSB Cell ...
+                        var cellTSB = row.insertCell(0);
+                        cellTSB.innerHTML = i + ":" + j +":" + k;
+                        // ... create the Used Cell ...
+                        var cellUsed = row.insertCell(1);
+                        cellUsed.innerHTML = dataArray[0].valueOf();
+                        // ... create the Next Cell ...
+                        var cellNext = row.insertCell(2);
+                        cellNext.innerHTML = dataArray[1] + ":" + dataArray[2] + ":" + dataArray[3];
+                        // ... create the Data Cell
+                        var cellData = row.insertCell(3);
+                        var dataString = new String();
+                        for (var w = 4; w < dataArray.length; w++) {  //Does someone know the commonly used letter in a 4th for loop? Ill use w cause its a pretty cool letter
+                            dataString += dataArray[w].valueOf();
+                        }
+                        cellData.innerHTML = dataString.valueOf();
+                    }
+                }
+            }
+        }
+
+        // Clear Disk Table
+        public static diskTableClear() {
+            var diskTable = <HTMLTableElement>document.getElementById("diskTable");
+                // delete each row
+                for (var i = diskTable.rows.length; i > 1; i--){
+                    diskTable.deleteRow(i-1);
+                }
+        }
+
+
+
         // Updates all GUI Tables
         public static updateAllTables() {
             this.processTableClear();
@@ -287,6 +354,9 @@ module TSOS {
             this.processTableUpdate();
             this.memoryTableUpdate();
             this.CPUTableUpdate();
+            if (_DiskFormatted) {
+                this.diskTableUpdate();
+            }
         }
     }
 }

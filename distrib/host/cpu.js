@@ -95,7 +95,7 @@ var TSOS;
                         break; //system call (used for printing stuff)
                     default:
                         // There was an invalid op code
-                        console.log("Invalid Op Code");
+                        console.log("Invalid Op Code" + _CurrentPCB.IR);
                         var params = [_CurrentPCB.PID.toString(), 'Running Process Invalid Op Code'];
                         _KernelInterruptQueue.enqueue(new TSOS.Interrupt(PROCESS_BREAK_IRQ, params));
                 }
@@ -200,6 +200,7 @@ var TSOS;
             _CurrentPCB = null;
             TSOS.Control.updateAllTables();
             TSOS.Control.CPUTableClear();
+            _MemoryManager.loadDiskProcess();
             _Scheduler.makeDecision();
         };
         Cpu.prototype.compareMemToXreg = function () {

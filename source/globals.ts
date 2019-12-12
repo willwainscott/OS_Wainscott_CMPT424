@@ -12,7 +12,7 @@
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
 const APP_NAME: string    = "NASOS";   // Not a Simulation Operating System? Note: I hope changing this doesn't break everything that uses TSOS
-const APP_VERSION: string = "0.3";   // I assume this will be always updated and completely accurate
+const APP_VERSION: string = "0.4";   // I assume this will be always updated and completely accurate
 
 const CPU_CLOCK_INTERVAL: number = 100;   // This is in ms (milliseconds) so 1000 = 1 second.
 
@@ -31,10 +31,14 @@ const CONTEXT_SWITCH_IRQ: number = 4;
 var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _Memory: TSOS.Memory;
 var _MemoryAccessor: TSOS.MemoryAccessor;
+var _Disk: TSOS.Disk;
+var _DiskFormatted: boolean = false;
 
 var _MemoryManager: any = null;
 var _Scheduler: any = null;
+var _SchedulingAlgorithm: string = "Round Robin"; // Scheduling algorithm, defaulted to RoundRobin
 var _RRQuantum: number = 6;     // Default Round Robin Scheduling Quantum
+var _TempQuantum: number = null; // Used to store the quantum if the algorithm is changed to fcfs
 
 var _PCBList: TSOS.PCB[] = [];
 var _CurrentPCB: TSOS.PCB = null;
@@ -71,7 +75,8 @@ var _OsShell: TSOS.Shell;
 var _SarcasticMode: boolean = false;
 
 // Global Device Driver Objects - page 12
-var _krnKeyboardDriver: TSOS.DeviceDriverKeyboard  = null;
+var _krnKeyboardDriver: TSOS.DeviceDriverKeyboard = null;
+var _krnDiskDriver: TSOS.DeviceDriverDisk = null;
 
 var _hardwareClockID: number = null;
 
