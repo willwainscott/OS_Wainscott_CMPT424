@@ -19,17 +19,23 @@ var TSOS;
             }
             TSOS.Control.updateAllTables();
         };
-        MemoryManager.prototype.loadMemory = function (userInput, section) {
+        MemoryManager.prototype.loadMemory = function (userInputArray, section, PID) {
             // make array of the entered commands
-            var userInputArray = userInput.split(" ");
-            // load them into memory
-            for (var i = 0; i < userInputArray.length; i++) {
-                _Memory.memoryArray[i + _Memory.getBaseBySection(section)] = userInputArray[i];
+            if (!(section == "disk")) {
+                // load them into memory
+                for (var i = 0; i < userInputArray.length; i++) {
+                    _Memory.memoryArray[i + _Memory.getBaseBySection(section)] = userInputArray[i];
+                }
+            }
+            else {
+                _krnDiskDriver.createSwapFile(PID, userInputArray);
             }
         };
         MemoryManager.prototype.memoryAvailabilityCheck = function () {
             return (_PCBList.length < 3);
         };
+        // checks to see if there are any processes on the disk
+        MemoryManager.prototype.processOnDisk = function () { };
         MemoryManager.prototype.assignMemorySection = function () {
             // This is where we would check to see if there is something in memory in specific sections
             var sectionOneOpen = true;
@@ -48,6 +54,7 @@ var TSOS;
                     case "3":
                         sectionThreeOpen = false;
                         break;
+                    case "disk": break;
                     default: console.log("Invalid section when trying to check available memory sections");
                 }
             }
@@ -95,6 +102,45 @@ var TSOS;
                     return i;
                 }
             }
+        };
+        MemoryManager.prototype.rollInProcess = function (PID) {
+            var rollInDataArray = [];
+            var PCB = this.getPCBByPID(PID);
+            if (this.memoryAvailabilityCheck()) {
+                // get the data
+                rollInDataArray = _krnDiskDriver.getRollInData(PID);
+                // change the section
+                PCB.section = this.assignMemorySection();
+                // change the location
+                PCB.location = "Memory";
+                this.loadMemory(rollInDataArray, PCB.section, PID);
+            }
+            else {
+                this.rollOutProcess();
+                // get the data
+                rollInDataArray = _krnDiskDriver.getRollInData(PID);
+                // change the section
+                PCB.section = this.assignMemorySection();
+                // change the location
+                PCB.location = "Memory";
+                this.loadMemory(rollInDataArray, PCB.section, PID);
+            }
+        };
+        MemoryManager.prototype.rollOutProcess = function () {
+            // decide which one gets rolled out
+            var rollOutPCB = _Scheduler.rollOutPCBDecision();
+            _PCBList[this.getIndexByPID(_PCBList, rollOutPCB.PID)].timesSwapped++;
+            // write the data from memory to the disk
+            var rollOutDataArray = [];
+            for (var i = _Memory.getBaseBySection(rollOutPCB.section); i < _Memory.getLimitBySection(rollOutPCB.section); i++) {
+                rollOutDataArray[rollOutDataArray.length] = _Memory.memoryArray[i];
+            }
+            _krnDiskDriver.createSwapFile(rollOutPCB.PID, rollOutDataArray);
+            // clear the memory where the last process was
+            this.clearMemory(rollOutPCB.section);
+            //change the location and section of the rolled out process
+            _PCBList[this.getIndexByPID(_PCBList, rollOutPCB.PID)].location = "Disk";
+            _PCBList[this.getIndexByPID(_PCBList, rollOutPCB.PID)].section = "disk";
         };
         return MemoryManager;
     }());

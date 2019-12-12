@@ -93,6 +93,33 @@ var TSOS;
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, params));
             }
         };
+        Scheduler.prototype.rollOutPCBDecision = function () {
+            var swapPCB;
+            var memoryPCBs = [];
+            for (var i = 0; i < _PCBList.length; i++) {
+                if (_PCBList[i].location == "Memory") {
+                    memoryPCBs[memoryPCBs.length] = _PCBList[i];
+                }
+            }
+            swapPCB = memoryPCBs[0];
+            // if its priority, roll out the process with the lowest priority
+            if (_SchedulingAlgorithm == "Priority") {
+                for (var i = 1; i < memoryPCBs.length; i++) {
+                    if (memoryPCBs[i].priority > swapPCB.priority) {
+                        swapPCB = memoryPCBs[i];
+                    }
+                }
+            }
+            else {
+                // if its Round Robin roll out the process that has been swapped the least
+                for (var i = 1; i < memoryPCBs.length; i++) {
+                    if (memoryPCBs[i].timesSwapped < swapPCB.timesSwapped) {
+                        swapPCB = memoryPCBs[i];
+                    }
+                }
+            }
+            return swapPCB;
+        };
         return Scheduler;
     }());
     TSOS.Scheduler = Scheduler;

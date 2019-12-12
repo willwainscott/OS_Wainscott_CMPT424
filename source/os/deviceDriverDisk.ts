@@ -171,6 +171,33 @@ module TSOS {
             }
         }
 
+        public createSwapFile(PID, userDataArray: string[]) {
+            // create a swap file name block
+            if (this.createFile("~SwapFile " + PID)) {
+                // Add 00s onto the end to take up the necessary space
+                for (var i = userDataArray.length; i < 256; i++) {
+                    userDataArray[userDataArray.length] = "00";
+                }
+                this.writeFile(this.findFileTSB("~SwapFile " + PID),userDataArray.join(), "swap");
+            } else {
+                console.log("Error, swap file already exists.");
+            }
+
+        }
+
+        // returns the data of a process that is getting rolled in
+        public getRollInData(PID: number) {
+            // gets the data from the swap file
+            var rollInNameTSB = this.findFileTSB("~SwapFile " + PID);
+            var rollInData = this.readSwapFileData(rollInNameTSB);
+
+            // deletes the swap file from the disk
+            this.deleteFile(rollInNameTSB);
+
+            return rollInData.slice(0,256);
+
+        }
+
         public readFile(fileNameTSB: string) {
             // Used the Name TSB to get the first data TSB
             var nameTSBArray: string[] = sessionStorage.getItem(fileNameTSB).split(",");
@@ -178,6 +205,26 @@ module TSOS {
 
             return this.readFileData(dataTSBArray);
 
+        }
+
+        public readSwapFileData(fileNameTSB:string) {
+            var swapFileData: string[] = [];
+            var nameTSBArray: string[] = sessionStorage.getItem(fileNameTSB).split(",");
+            var dataTSB: string = nameTSBArray[1] + ":" + nameTSBArray[2] + ":" + nameTSBArray[3]
+            var dataTSBArray: string[] = sessionStorage.getItem(dataTSB).split(",");
+            // Add the data to the array
+            for (var i = 4; i < dataTSBArray.length; i++) {
+                swapFileData[swapFileData.length] = dataTSBArray[i];
+            }
+            // Check for another data block
+            var nextBlockTSB: string = dataTSBArray[1] + ":" + dataTSBArray[2] + ":" + dataTSBArray[3];
+            // if there is a next block, hit me up with that sweet recursion
+            if (!(nextBlockTSB == "FF:FF:FF")) {
+                swapFileData = swapFileData.concat(this.readSwapFileData(dataTSB));
+                return swapFileData;
+            } else {
+                return swapFileData;
+            }
         }
 
         // returns the string that contains the data in a file
@@ -196,11 +243,13 @@ module TSOS {
                 return fileData;
             } else {
                 fileData += this.readFileData(sessionStorage.getItem(nextBlockTSB).split(","));
+                return fileData;
             }
             // Note: if this works, this is something that I think is cool.
         }
 
-        public writeFile(fileNameTSB: string, userData: string) {
+        // write the data of a file based on what kind of file it is (swap file or other)
+        public writeFile(fileNameTSB: string, userData: string, fileType: string) {
             // since write overwrites anything written in a file, we can just delete all the data blocks and start over so we don't have extra data blocks allocated
             this.deleteFileDataBlock(fileNameTSB);
             /* this way of doing it was Danny Grossman's idea (dgrossmann144 of GitHub), no code has been copied,
@@ -210,29 +259,62 @@ module TSOS {
             var nameBlockArray = sessionStorage.getItem(fileNameTSB).split(",");
             var dataBlockTSB = nameBlockArray[1] + ":" + nameBlockArray[2] + ":" + nameBlockArray[3];
 
-            // Create an array of hex pairs to add to the file
-            var userDataArray: string[] = [];
-            for(var i = 0; i < userData.length; i++) {
-                userDataArray[userDataArray.length] = Utils.decimalToHexString(userData.charCodeAt(i));
+            // make the data block in use because we deleted all the previous blocks
+            // Create an empty block array
+            var emptyBlock: String[] = new Array(64);
+            for (var i = 0; i < emptyBlock.length; i++) {
+                if (i < 4) {
+                    emptyBlock[i] = "0";
+                } else {
+                    emptyBlock[i] = "00"
+                }
             }
-            // Write to the actual data blocks
-            this.writeToDataBlocks(userDataArray,dataBlockTSB);
-
+            // and change used bit back to in use
+            emptyBlock[0] = "1";
+            sessionStorage.setItem(dataBlockTSB,emptyBlock.join());
+            //if its a swap file, its already in hex so we dont need to convert it
+            if (fileType == "swap") {
+                // Write the hex to disk
+                this.writeToDataBlocks(userData.split(","), dataBlockTSB);
+            } else {
+                // Create an array of hex pairs to add to the file
+                var userDataArray: string[] = [];
+                for(var i = 0; i < userData.length; i++) {
+                    userDataArray[userDataArray.length] = Utils.decimalToHexString(userData.charCodeAt(i));
+                }
+                // Write to the actual data blocks
+                this.writeToDataBlocks(userDataArray,dataBlockTSB);
+            }
             Control.diskTableUpdate();
         }
 
         // writes the data given in an array to one or many data blocks depending on how much room is required
         public writeToDataBlocks(userDataArray: string[], dataBlockTSB: string) {
-            var nextBlockTSB: string = this.firstAvailableDataTSB(); // In case the data is > 60
+
             // if we need more than one block for the file do some fancy recursion!
             if (userDataArray.length > 60) {
+                var nextBlockTSB: string = this.firstAvailableDataTSB();
+                // claim that block so the other blocks know its being used
+                // Create an empty block array
+                var emptyBlock: String[] = new Array(64);
+                for (var i = 0; i < emptyBlock.length; i++) {
+                    if (i < 4) {
+                        emptyBlock[i] = "0";
+                    } else {
+                        emptyBlock[i] = "00"
+                    }
+                }
+                // and change used bit back to in use
+                emptyBlock[0] = "1";
+                sessionStorage.setItem(nextBlockTSB,emptyBlock.join());
+
                 var newUserDataArray = userDataArray.splice(0,60);
-                this.writeToDataBlocks(newUserDataArray,nextBlockTSB);  // So much recursion! Very cool!
+                this.writeToDataBlocks(userDataArray,nextBlockTSB);  // So much recursion! Very cool!
                 // make the array of the data start with the used bit and the three digits of the next TSB
                 var dataBlockArray: string[] = ["1",nextBlockTSB[0],nextBlockTSB[2], nextBlockTSB[4]];
                 // then add the data from the userDataArray
                 for (var i = 0; i < 60; i++){
-                    dataBlockArray[dataBlockArray.length] = userDataArray[i];
+                    dataBlockArray[dataBlockArray.length] = newUserDataArray[i];
                 }
                 // and put it into session storage
                 sessionStorage.setItem(dataBlockTSB,dataBlockArray.join());

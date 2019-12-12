@@ -166,6 +166,9 @@ module TSOS {
                     }
                 case CONTEXT_SWITCH_IRQ:            // Changing the process that the CPU is running
                     _CurrentPCB = params[0];
+                    if (_CurrentPCB.location == "Disk"){
+                        _MemoryManager.rollInProcess(params[0].PID);
+                    }
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

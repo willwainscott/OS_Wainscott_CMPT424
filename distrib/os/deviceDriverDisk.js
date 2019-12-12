@@ -167,11 +167,53 @@ var TSOS;
                 return false;
             }
         };
+        DeviceDriverDisk.prototype.createSwapFile = function (PID, userDataArray) {
+            // create a swap file name block
+            if (this.createFile("~SwapFile " + PID)) {
+                // Add 00s onto the end to take up the necessary space
+                for (var i = userDataArray.length; i < 256; i++) {
+                    userDataArray[userDataArray.length] = "00";
+                }
+                this.writeFile(this.findFileTSB("~SwapFile " + PID), userDataArray.join(), "swap");
+            }
+            else {
+                console.log("Error, swap file already exists.");
+            }
+        };
+        // returns the data of a process that is getting rolled in
+        DeviceDriverDisk.prototype.getRollInData = function (PID) {
+            // gets the data from the swap file
+            var rollInNameTSB = this.findFileTSB("~SwapFile " + PID);
+            var rollInData = this.readSwapFileData(rollInNameTSB);
+            // deletes the swap file from the disk
+            this.deleteFile(rollInNameTSB);
+            return rollInData.slice(0, 256);
+        };
         DeviceDriverDisk.prototype.readFile = function (fileNameTSB) {
             // Used the Name TSB to get the first data TSB
             var nameTSBArray = sessionStorage.getItem(fileNameTSB).split(",");
             var dataTSBArray = sessionStorage.getItem(nameTSBArray[1] + ":" + nameTSBArray[2] + ":" + nameTSBArray[3]).split(",");
             return this.readFileData(dataTSBArray);
+        };
+        DeviceDriverDisk.prototype.readSwapFileData = function (fileNameTSB) {
+            var swapFileData = [];
+            var nameTSBArray = sessionStorage.getItem(fileNameTSB).split(",");
+            var dataTSB = nameTSBArray[1] + ":" + nameTSBArray[2] + ":" + nameTSBArray[3];
+            var dataTSBArray = sessionStorage.getItem(dataTSB).split(",");
+            // Add the data to the array
+            for (var i = 4; i < dataTSBArray.length; i++) {
+                swapFileData[swapFileData.length] = dataTSBArray[i];
+            }
+            // Check for another data block
+            var nextBlockTSB = dataTSBArray[1] + ":" + dataTSBArray[2] + ":" + dataTSBArray[3];
+            // if there is a next block, hit me up with that sweet recursion
+            if (!(nextBlockTSB == "FF:FF:FF")) {
+                swapFileData = swapFileData.concat(this.readSwapFileData(dataTSB));
+                return swapFileData;
+            }
+            else {
+                return swapFileData;
+            }
         };
         // returns the string that contains the data in a file
         DeviceDriverDisk.prototype.readFileData = function (fileArray) {
@@ -195,7 +237,8 @@ var TSOS;
             }
             // Note: if this works, this is something that I think is cool.
         };
-        DeviceDriverDisk.prototype.writeFile = function (fileNameTSB, userData) {
+        // write the data of a file based on what kind of file it is (swap file or other)
+        DeviceDriverDisk.prototype.writeFile = function (fileNameTSB, userData, fileType) {
             // since write overwrites anything written in a file, we can just delete all the data blocks and start over so we don't have extra data blocks allocated
             this.deleteFileDataBlock(fileNameTSB);
             /* this way of doing it was Danny Grossman's idea (dgrossmann144 of GitHub), no code has been copied,
@@ -217,20 +260,41 @@ var TSOS;
             // and change used bit back to in use
             emptyBlock[0] = "1";
             sessionStorage.setItem(dataBlockTSB, emptyBlock.join());
-            // Create an array of hex pairs to add to the file
-            var userDataArray = [];
-            for (var i = 0; i < userData.length; i++) {
-                userDataArray[userDataArray.length] = TSOS.Utils.decimalToHexString(userData.charCodeAt(i));
+            //if its a swap file, its already in hex so we dont need to convert it
+            if (fileType == "swap") {
+                // Write the hex to disk
+                this.writeToDataBlocks(userData.split(","), dataBlockTSB);
             }
-            // Write to the actual data blocks
-            this.writeToDataBlocks(userDataArray, dataBlockTSB);
+            else {
+                // Create an array of hex pairs to add to the file
+                var userDataArray = [];
+                for (var i = 0; i < userData.length; i++) {
+                    userDataArray[userDataArray.length] = TSOS.Utils.decimalToHexString(userData.charCodeAt(i));
+                }
+                // Write to the actual data blocks
+                this.writeToDataBlocks(userDataArray, dataBlockTSB);
+            }
             TSOS.Control.diskTableUpdate();
         };
         // writes the data given in an array to one or many data blocks depending on how much room is required
         DeviceDriverDisk.prototype.writeToDataBlocks = function (userDataArray, dataBlockTSB) {
-            var nextBlockTSB = this.firstAvailableDataTSB(); // In case the data is > 60
             // if we need more than one block for the file do some fancy recursion!
             if (userDataArray.length > 60) {
+                var nextBlockTSB = this.firstAvailableDataTSB();
+                // claim that block so the other blocks know its being used
+                // Create an empty block array
+                var emptyBlock = new Array(64);
+                for (var i = 0; i < emptyBlock.length; i++) {
+                    if (i < 4) {
+                        emptyBlock[i] = "0";
+                    }
+                    else {
+                        emptyBlock[i] = "00";
+                    }
+                }
+                // and change used bit back to in use
+                emptyBlock[0] = "1";
+                sessionStorage.setItem(nextBlockTSB, emptyBlock.join());
                 var newUserDataArray = userDataArray.splice(0, 60);
                 this.writeToDataBlocks(userDataArray, nextBlockTSB); // So much recursion! Very cool!
                 // make the array of the data start with the used bit and the three digits of the next TSB

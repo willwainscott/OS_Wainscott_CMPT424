@@ -535,6 +535,8 @@ var TSOS;
                 if (_MemoryManager.memoryAvailabilityCheck()) {
                     //Make every character in the codes uppercase
                     userCode = userCode.toUpperCase();
+                    // split it into an array
+                    var userCodeArray = userCode.split(" ");
                     //load it into memory ...
                     // create a PCB
                     var PCB = new TSOS.PCB();
@@ -543,17 +545,17 @@ var TSOS;
                     _PIDCounter++; // Increment to prevent duplicate PIDs
                     // give it a priority
                     PCB.priority = priority;
+                    //Assign it a location
+                    PCB.location = "Memory";
                     // Assign it a section in memory
                     PCB.section = _MemoryManager.assignMemorySection();
                     //Add it to global list of Resident PCBs
                     _PCBList[_PCBList.length] = PCB;
                     console.log(_PCBList);
                     //clear memory before loading
-                    // NOTE: Will probably change it such that when a program is completed or terminated the memory is cleared
-                    // instead of keeping the old program in memory and only removing it when a new one is loaded
                     _MemoryManager.clearMemory(PCB.section);
                     //use memory manager to load
-                    _MemoryManager.loadMemory(userCode, PCB.section);
+                    _MemoryManager.loadMemory(userCodeArray, PCB.section, PCB.PID);
                     // Update the PCB's IR
                     PCB.IR = _MemoryAccessor.readMemoryToHex(PCB.section, PCB.PC);
                     // Update Memory GUI
@@ -569,12 +571,53 @@ var TSOS;
                     }
                     _StdOut.putText("Process ID Number: " + PCB.PID);
                 }
+                else if (_DiskFormatted) {
+                    _StdOut.putText("Memory is full. Loading process onto disk.");
+                    _StdOut.advanceLine();
+                    //Make every character in the codes uppercase
+                    userCode = userCode.toUpperCase();
+                    // split it into an array
+                    var userCodeArray = userCode.split(" ");
+                    //load it into memory ...
+                    // create a PCB
+                    var PCB = new TSOS.PCB();
+                    // give it a PID
+                    PCB.PID = _PIDCounter;
+                    _PIDCounter++; // Increment to prevent duplicate PIDs
+                    // give it a priority
+                    PCB.priority = priority;
+                    // Assign it a location
+                    PCB.location = "Disk";
+                    // Assign it a section
+                    PCB.section = "disk";
+                    //Add it to global list of Resident PCBs
+                    _PCBList[_PCBList.length] = PCB;
+                    console.log(_PCBList);
+                    //use memory manager to load
+                    _MemoryManager.loadMemory(userCodeArray, PCB.section, PCB.PID);
+                    // Update the PCB's IR
+                    PCB.IR = userCode[0] + userCode[1] + "";
+                    // Make the times swapped 1 to make it more fair for processes who started out on the disk
+                    PCB.timesSwapped = 1;
+                    // Update Memory GUI
+                    TSOS.Control.memoryTableUpdate();
+                    // Update PCB GUI
+                    TSOS.Control.processTableUpdate();
+                    // print out response
+                    _StdOut.putText("User code loaded successfully");
+                    _StdOut.advanceLine();
+                    if (_SarcasticMode) {
+                        _StdOut.putText("Congrats, you're not completely useless.");
+                        _StdOut.advanceLine();
+                    }
+                    _StdOut.putText("Process ID Number: " + PCB.PID);
+                }
                 else {
-                    _StdOut.putText("Memory is full. Please run a process or clear the memory to load.");
+                    _StdOut.putText("Memory is full. Please format disk to load more processes.");
                 }
             }
             else {
-                _StdOut.putText("Please ensure user code is valid hexadecimal");
+                _StdOut.putText("Please ensure user code is valid hexadecimal.");
             }
         };
         Shell.prototype.shellRun = function (args) {
@@ -844,7 +887,7 @@ var TSOS;
                         if (fileNameTSB != null) {
                             args.shift();
                             // if all theses checks pass, write to the file
-                            _krnDiskDriver.writeFile(fileNameTSB, args.join(" "));
+                            _krnDiskDriver.writeFile(fileNameTSB, args.join(" "), "user");
                             _StdOut.putText("File written to successfully.");
                         }
                         else {
