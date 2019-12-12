@@ -195,6 +195,7 @@ module TSOS {
             _CurrentPCB = null;
             Control.updateAllTables();
             Control.CPUTableClear();
+            _MemoryManager.loadDiskProcess();
             _Scheduler.makeDecision();
         }
 

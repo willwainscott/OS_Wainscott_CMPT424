@@ -200,6 +200,7 @@ var TSOS;
             _CurrentPCB = null;
             TSOS.Control.updateAllTables();
             TSOS.Control.CPUTableClear();
+            _MemoryManager.loadDiskProcess();
             _Scheduler.makeDecision();
         };
         Cpu.prototype.compareMemToXreg = function () {

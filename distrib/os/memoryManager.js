@@ -30,12 +30,20 @@ var TSOS;
             else {
                 _krnDiskDriver.createSwapFile(PID, userInputArray);
             }
+            TSOS.Control.updateAllTables();
         };
         MemoryManager.prototype.memoryAvailabilityCheck = function () {
             return (_PCBList.length < 3);
         };
         // checks to see if there are any processes on the disk
-        MemoryManager.prototype.processOnDisk = function () { };
+        MemoryManager.prototype.processOnDisk = function () {
+            for (var i = 0; i < _PCBList.length; i++) {
+                if (_PCBList[i].location == "Disk") {
+                    return true;
+                }
+            }
+            return false;
+        };
         MemoryManager.prototype.assignMemorySection = function () {
             // This is where we would check to see if there is something in memory in specific sections
             var sectionOneOpen = true;
@@ -106,7 +114,13 @@ var TSOS;
         MemoryManager.prototype.rollInProcess = function (PID) {
             var rollInDataArray = [];
             var PCB = this.getPCBByPID(PID);
-            if (this.memoryAvailabilityCheck()) {
+            var memoryPCBs = [];
+            for (var i = 0; i < _PCBList.length; i++) {
+                if (_PCBList[i].location == "Memory") {
+                    memoryPCBs[memoryPCBs.length] = _PCBList[i];
+                }
+            }
+            if (memoryPCBs.length < 3) {
                 // get the data
                 rollInDataArray = _krnDiskDriver.getRollInData(PID);
                 // change the section
@@ -141,6 +155,18 @@ var TSOS;
             //change the location and section of the rolled out process
             _PCBList[this.getIndexByPID(_PCBList, rollOutPCB.PID)].location = "Disk";
             _PCBList[this.getIndexByPID(_PCBList, rollOutPCB.PID)].section = "disk";
+        };
+        // loads a process on the disk of there is free space in memory
+        MemoryManager.prototype.loadDiskProcess = function () {
+            if (this.processOnDisk()) {
+                var PCB;
+                for (var i = 0; i < _PCBList.length; i++) {
+                    if (_PCBList[i].location == "Disk") {
+                        PCB = _PCBList[i];
+                    }
+                }
+                this.rollInProcess(PCB.PID);
+            }
         };
         return MemoryManager;
     }());

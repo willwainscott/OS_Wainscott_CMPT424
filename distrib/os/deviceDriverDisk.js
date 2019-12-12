@@ -324,6 +324,22 @@ var TSOS;
             // update the GUI
             TSOS.Control.diskTableUpdate();
         };
+        DeviceDriverDisk.prototype.deleteFileByName = function (fileName) {
+            this.deleteFile(this.findFileTSB(fileName));
+        };
+        DeviceDriverDisk.prototype.deleteAllSwapFiles = function () {
+            var tempBlockArray;
+            var tempBlockName;
+            for (var j = 0; j < _Disk.sectors; j++) {
+                for (var k = 0; k < _Disk.blocks; k++) {
+                    tempBlockArray = sessionStorage.getItem("0:" + j + ":" + k).split(",");
+                    tempBlockName = this.getFileName(tempBlockArray);
+                    if (tempBlockName[0] == "~") {
+                        this.deleteFile(this.findFileTSB(tempBlockName));
+                    }
+                }
+            }
+        };
         // deletes the block that stores the file name
         DeviceDriverDisk.prototype.deleteFileNameBlock = function (fileNameTSB) {
             var emptyBlock = new Array(64);

@@ -693,6 +693,10 @@ var TSOS;
                             _CurrentPCB = null;
                         }
                     }
+                    //if it was on the disk, remove it from the disk
+                    if (_MemoryManager.getPCBByPID(enteredPID).section == "disk") {
+                        _krnDiskDriver.deleteFileByName("~SwapFile " + enteredPID);
+                    }
                     // Clear that section in memory
                     _MemoryManager.clearMemory(_MemoryManager.getPCBByPID(enteredPID).section);
                     // remove it from the _PCBList(s)
@@ -722,6 +726,7 @@ var TSOS;
             }
             _StdOut.putText("terminated through user killall command.");
             _CurrentPCB = null;
+            _krnDiskDriver.deleteAllSwapFiles();
             _PCBList = [];
             _ReadyPCBList = [];
             _MemoryManager.clearMemory("all");

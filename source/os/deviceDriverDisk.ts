@@ -338,6 +338,24 @@ module TSOS {
             Control.diskTableUpdate();
         }
 
+        public deleteFileByName(fileName: string) {
+            this.deleteFile(this.findFileTSB(fileName));
+        }
+
+        public deleteAllSwapFiles() {
+            var tempBlockArray: string[];
+            var tempBlockName: string;
+            for (var j = 0; j < _Disk.sectors; j++){
+                for (var k = 0; k < _Disk.blocks; k++) {
+                    tempBlockArray = sessionStorage.getItem("0:" + j + ":" + k).split(",");
+                    tempBlockName = this.getFileName(tempBlockArray);
+                    if (tempBlockName[0] == "~") {
+                        this.deleteFile(this.findFileTSB(tempBlockName));
+                    }
+                }
+            }
+        }
+
         // deletes the block that stores the file name
         public deleteFileNameBlock(fileNameTSB: string){
             var emptyBlock: String[] = new Array(64);

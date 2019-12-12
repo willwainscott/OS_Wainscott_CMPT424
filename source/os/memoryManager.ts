@@ -33,6 +33,7 @@ module TSOS {
             } else {
                 _krnDiskDriver.createSwapFile(PID,userInputArray);
             }
+            Control.updateAllTables();
         }
 
         public memoryAvailabilityCheck() {
@@ -41,6 +42,12 @@ module TSOS {
 
         // checks to see if there are any processes on the disk
         public processOnDisk() {
+            for (var i = 0; i < _PCBList.length; i++) {
+                if (_PCBList[i].location == "Disk") {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public assignMemorySection() {
@@ -107,7 +114,13 @@ module TSOS {
         public rollInProcess(PID: number) {
             var rollInDataArray: string[] = [];
             var PCB = this.getPCBByPID(PID);
-            if (this.memoryAvailabilityCheck()) {
+            var memoryPCBs: TSOS.PCB[] = [];
+            for (var i = 0; i < _PCBList.length; i++) {
+                if (_PCBList[i].location == "Memory") {
+                    memoryPCBs[memoryPCBs.length] = _PCBList[i];
+                }
+            }
+            if (memoryPCBs.length < 3) {
                 // get the data
                 rollInDataArray = _krnDiskDriver.getRollInData(PID);
                 // change the section
@@ -145,6 +158,20 @@ module TSOS {
             //change the location and section of the rolled out process
             _PCBList[this.getIndexByPID(_PCBList,rollOutPCB.PID)].location = "Disk";
             _PCBList[this.getIndexByPID(_PCBList,rollOutPCB.PID)].section = "disk";
+        }
+
+        // loads a process on the disk of there is free space in memory
+        public loadDiskProcess() {
+            if (this.processOnDisk()) {
+                var PCB: TSOS.PCB;
+                for (var i = 0; i < _PCBList.length; i++) {
+                    if (_PCBList[i].location == "Disk"){
+                        PCB = _PCBList[i];
+                    }
+                }
+                this.rollInProcess(PCB.PID);
+            }
+
         }
 
 
