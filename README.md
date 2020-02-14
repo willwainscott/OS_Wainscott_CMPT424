@@ -11,8 +11,7 @@ I used TypeScript to create a working operating system that runs in the web brow
 
 
 
-The list of commands for my OS are:
-
+### The list of commands for my OS are:
   ver - shows the current cersion of the OS. \
   help - shows the full list of commands (Note: hard to use because no way to scroll back up on the cli. Maybe a future feature?). \
   shutdown - shuts down the virtual OS. \
