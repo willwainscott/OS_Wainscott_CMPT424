@@ -40,4 +40,4 @@ I used TypeScript to create a working operating system that runs in the web brow
   read <filename> - reads the contents of a given file. \
   write <filename> "data" - writes the data in double quotes to a given file. \
   delete <filename> - deletes a given file. \
-  ls - lists all of the files on the disk. \
+  ls - lists all of the files on the disk. 
